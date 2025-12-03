@@ -3,13 +3,17 @@ package main
 import (
 	log "log"
 	os "os"
-
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	
-	//TODO: перейти на github.com/joho/godotenv
+
 	token := os.Getenv("TELEGRAM_TOKEN")
 	if token == "" {
 		log.Fatal("TELEGRAM_TOKEN is not set")
