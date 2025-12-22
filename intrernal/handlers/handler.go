@@ -8,6 +8,7 @@ import (
 
 //====================================================================================================
 
+// Общий разделитель
 func HandleUpdate(bot *telegram.BotAPI, update telegram.Update) {
 	if update.Message == nil {
 		return
@@ -28,6 +29,7 @@ func HandleUpdate(bot *telegram.BotAPI, update telegram.Update) {
 
 //====================================================================================================
 
+// разделитель комманд
 func handleCommand(bot *telegram.BotAPI, update telegram.Update) {
 	chatID := update.Message.Chat.ID
 
@@ -37,6 +39,7 @@ func handleCommand(bot *telegram.BotAPI, update telegram.Update) {
 			chatID,
 			"Привет! Отправь документ для конвертации.",
 		))
+		//TODO: Выход на бизнес-логику - первичное сохранение пользователя в БД
 	default:
 		bot.Send(telegram.NewMessage(
 			chatID,
@@ -45,6 +48,7 @@ func handleCommand(bot *telegram.BotAPI, update telegram.Update) {
 	}
 }
 
+// разделитель документов
 func handleDocument(bot *telegram.BotAPI, update telegram.Update) {
 	doc := update.Message.Document
 	chatID := update.Message.Chat.ID
@@ -76,6 +80,7 @@ func handlePDF(bot *telegram.BotAPI, chatID int64) {
 		chatID,
 		"PDF получен",
 	))
+	//TODO: Выход на логику - обращение у АПИ
 }
 
 func handleDOCX(bot *telegram.BotAPI, chatID int64) {
@@ -83,6 +88,7 @@ func handleDOCX(bot *telegram.BotAPI, chatID int64) {
 		chatID,
 		"DOCX получен",
 	))
+	//TODO: Выход на логику - обращение у АПИ
 }
 
 func handleXLSX(bot *telegram.BotAPI, chatID int64) {
@@ -90,11 +96,14 @@ func handleXLSX(bot *telegram.BotAPI, chatID int64) {
 		chatID,
 		"XLSX получен",
 	))
+	//TODO: Выход на логику - обращение у АПИ
 }
+
+//====================================================================================================
 
 func handleText(bot *telegram.BotAPI, update telegram.Update) {
 	bot.Send(telegram.NewMessage(
 		update.Message.Chat.ID,
-		"Я понимаю команды и документы",
+		"Я принимаю только команды и документы",
 	))
 }
