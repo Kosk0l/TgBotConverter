@@ -1,6 +1,7 @@
 package app // Связка компонентов
 
 import (
+	//"fmt"
 	"log"
 
 	"github.com/Kosk0l/TgBotConverter/config"
@@ -21,10 +22,21 @@ func NewApp(cfg *config.Config) (*App) {
 		log.Fatal(err)
 	}
 
+	// dsn := fmt.Sprintf(
+	// 	"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+	// 	cfg.Db.User,
+	// 	cfg.Db.Pass,
+	// 	cfg.Db.Host,
+	// 	cfg.Db.Port,
+	// 	cfg.Db.Name,
+	// )
+
 	//TODO: реализовать конструктор pgxpool
 	
+	// Объект сервиса
 	userservice := userservice.NewService(nil)
 
+	// объект хендлера
 	handler := handlers.NewServer(bot, userservice)
 
 	bot.Debug = true

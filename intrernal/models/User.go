@@ -1,11 +1,11 @@
-package domains
+package models
 
 import "time"
 
 // domain services Пользователя
 type User struct {
 	ID        int64
-	UseNname  string
+	UserName  string
 	FirstName string
 	LastName  string
 	CreatedAt time.Time

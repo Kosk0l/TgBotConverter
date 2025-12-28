@@ -1,4 +1,4 @@
-CREATE TABLE USER (
+CREATE TABLE users (
     id BIGINT PRIMARY KEY,
     userName TEXT,
     firstName TEXT,
