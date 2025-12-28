@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"time"
-
 	"github.com/Kosk0l/TgBotConverter/intrernal/models"
 	"github.com/jackc/pgx/v5"
 )
@@ -34,6 +33,7 @@ func (p *Postgres) GetById(ctx context.Context, userId int64) (*models.User, err
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
 
+	user.ID = userId
 	return &user, nil
 }
 

@@ -3,6 +3,6 @@ CREATE TABLE users (
     userName TEXT,
     firstName TEXT,
     lastName TEXT,
-    createdAt TIMESTAMP NOT NULL,
-    lastSeenAt TIMESTAMP NOT NULL
+    createdAt TIMESTAMP NOT NULL DEFAULT now(),
+    lastSeenAt TIMESTAMP NOT NULL DEFAULT now()
 );
