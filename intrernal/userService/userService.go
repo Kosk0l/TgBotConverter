@@ -7,9 +7,10 @@ import (
 	"github.com/Kosk0l/TgBotConverter/intrernal/models"
 )
 
+// Контенкст создать в хендлере для сервисов // Контекст не должен жить долго
 type UserRepository interface {
 	GetById(ctx context.Context, userId int64) (*models.User, error) //TODO:
-	CreareUser(ctx context.Context, user *models.User) (int64, error)
+	CreareUser(ctx context.Context, user *models.User) (error)
 	UpdateUser(ctx context.Context, user *models.User) (error)
 	UpdateLastSeen(ctx context.Context, userId int64) (error)
 	DeleteUser(ctx context.Context, userid int64) (error)
@@ -37,9 +38,13 @@ func (u *UserService) GetByIdService(ctx context.Context, userId int64) (*models
 	return user, nil
 }
 
-func (u *UserService) CreateUserService(ctx context.Context, user *models.User) (int64, error) {
-	u.repo.CreareUser(ctx, user)
-	return 0, nil
+func (u *UserService) CreateUserService(ctx context.Context, user *models.User) (error) {
+	err := u.repo.CreareUser(ctx, user)
+	if err != nil {
+		return fmt.Errorf("error in create: %v", err)
+	}
+
+	return nil
 }
 
 func (u *UserService) UpdateUserService(ctx context.Context, user *models.User) (error) {

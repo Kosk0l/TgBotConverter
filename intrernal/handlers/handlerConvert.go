@@ -1,30 +1,32 @@
 package handlers
 
 import (
-	//userService "github.com/Kosk0l/TgBotConverter/intrernal/userService"
+	"context"
+
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-func (h *Handler) handlePDF(update telegram.Update) {
+//====================================================================================================
+
+func (h *Handler) handlePDF(ctx context.Context, update telegram.Update) {
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID, "PDF получен"))
 	// TODO: реализовать API бизнес-логику
 }
 
-func (h *Handler) handleDOCX(update telegram.Update) {
+func (h *Handler) handleDOCX(ctx context.Context, update telegram.Update) {
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID, "PDF получен"))
 	// TODO: реализовать API бизнес-логику
 }
 
-func (h *Handler) handleXLSX(update telegram.Update) {
+func (h *Handler) handleXLSX(ctx context.Context, update telegram.Update) {
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID, "PDF получен"))
 	// TODO: реализовать API бизнес-логику
 }
 
-func (h *Handler) HandleText(update telegram.Update) {
+func (h *Handler) HandleText(ctx context.Context, update telegram.Update) {
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"Я принимаю только команды и документы"))
 }
 
-//====================================================================================================
 // Вид json запроса: (все есть в update)
 
 	/*

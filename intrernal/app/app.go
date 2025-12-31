@@ -1,8 +1,9 @@
 package app // Связка компонентов
 
 import (
-	//"fmt"
+	"context"
 	"log"
+	"time"
 
 	"github.com/Kosk0l/TgBotConverter/config"
 	"github.com/Kosk0l/TgBotConverter/intrernal/handlers"
@@ -58,6 +59,14 @@ func (a *App) Run() () {
 
 	// проходка по каналу
 	for update := range updates {
-		a.handler.HandleUpdate(update)
+		go func(update telegram.Update) {
+			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+			defer cancel()
+			a.handler.HandleUpdate(ctx, update)
+		}(update)
 	}
+}
+
+func (a *App) Stop() () {
+
 }
