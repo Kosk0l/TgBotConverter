@@ -53,7 +53,6 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 
 	switch update.Message.Command() {
 	case "start":
-		h.bot.Send(telegram.NewMessage(chatID,"Привет! Отправь документ для конвертации."))
 		_, err := h.u.GetByIdService(ctx, update.Message.From.ID)
 		if err != nil {
 			var user models.User
@@ -63,7 +62,7 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 			user.LastName = update.Message.From.LastName
 			h.u.CreateUserService(ctx, &user)
 		}
-
+		h.bot.Send(telegram.NewMessage(chatID,"Привет! Отправь документ для конвертации."))
 	default:
 		h.bot.Send(telegram.NewMessage(chatID,"Неизвестная команда"))
 	}

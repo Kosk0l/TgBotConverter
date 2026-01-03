@@ -2,11 +2,13 @@ package app // Связка компонентов
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/Kosk0l/TgBotConverter/config"
 	"github.com/Kosk0l/TgBotConverter/intrernal/handlers"
+	"github.com/Kosk0l/TgBotConverter/intrernal/storage"
 	userservice "github.com/Kosk0l/TgBotConverter/intrernal/userService"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -17,39 +19,43 @@ type App struct {
 }
 
 // Конструктор
-func NewApp(cfg *config.Config) (*App) {
+func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
+	// объект бот
 	bot, err := telegram.NewBotAPI(cfg.App.TOKEN)
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("error in up telegram token(newapp constructor): %v", err)
 	}
 
-	// dsn := fmt.Sprintf(
-	// 	"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-	// 	cfg.Db.User,
-	// 	cfg.Db.Pass,
-	// 	cfg.Db.Host,
-	// 	cfg.Db.Port,
-	// 	cfg.Db.Name,
-	// )
-
-	//TODO: реализовать конструктор pgxpool
+	// объект постгреса 
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.Db.User,
+		cfg.Db.Pass,
+		cfg.Db.Host,
+		cfg.Db.Port,
+		cfg.Db.Name,
+	)
+	pool, err := storage.NewPostgres(ctx, dsn)
+	if err != nil {
+		return nil, fmt.Errorf("error in up storage: %v", err)
+	}
 	
 	// Объект сервиса
-	userservice := userservice.NewService(nil)
+	userservice := userservice.NewService(pool)
 
 	// объект хендлера
 	handler := handlers.NewServer(bot, userservice)
 
 	bot.Debug = true
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	log.Printf("\nAuthorized on account %s", bot.Self.UserName)
 	
 	return &App {
 		bot: bot,
 		handler: handler,
-	}
+	}, nil
 }
 
-func (a *App) Run() () {
+func (a *App) Run(ctx context.Context) () {
 	// Настраиваем получение апдейтов
 	u := telegram.NewUpdate(0)
 	u.Timeout = 30
@@ -60,9 +66,9 @@ func (a *App) Run() () {
 	// проходка по каналу
 	for update := range updates {
 		go func(update telegram.Update) {
-			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+			ctxUpdate, cancel := context.WithTimeout(ctx, 15*time.Second)
 			defer cancel()
-			a.handler.HandleUpdate(ctx, update)
+			a.handler.HandleUpdate(ctxUpdate, update)
 		}(update)
 	}
 }

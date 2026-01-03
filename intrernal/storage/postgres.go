@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -15,7 +16,7 @@ type Postgres struct {
 func NewPostgres(ctx context.Context, dsn string) (*Postgres, error) {
 	config, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		return nil, fmt.Errorf("error in config_up database: %w", err)
+		return nil, fmt.Errorf("error - config_up database: %w", err)
 	}
 
 	config.MaxConns = 10 // Максимальное количество открытых соединений
@@ -24,7 +25,7 @@ func NewPostgres(ctx context.Context, dsn string) (*Postgres, error) {
 	// подключение
 	newpool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
-		return nil, fmt.Errorf("error in create newpool: %w", err)
+		return nil, fmt.Errorf("error - create newpool: %w", err)
 	}
 
 	return &Postgres{
