@@ -10,10 +10,10 @@ import (
 
 type DBConfig struct {
 	Host string `env:"DB_HOST" envDefault:"localhost"`
-	Port string `env:"DB_PORT" envDefault:"5432"`
-	User string `env:"DB_USER,required" envDefault:"5432"`
-	Pass string `env:"DB_PASS,required" envDefault:"5432"`
-	Name string `env:"DB_NAME,required" envDefault:"5432"`
+	Port string `env:"DB_PORT" envDefault:"5433"`
+	User string `env:"DB_USER,required"`
+	Pass string `env:"DB_PASS,required"`
+	Name string `env:"DB_NAME,required"`
 	SSL  string `env:"DB_SSL" envDefault:"disable"`
 }
 
