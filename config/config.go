@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/caarlos0/env/v11"
@@ -34,4 +35,18 @@ func Load() (*Config) {
 	}
 
 	return &cfg
+}
+
+//====================================================================================================
+
+func LoadDsn(cfg *Config) (string) {
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cfg.Db.User,
+		cfg.Db.Pass,
+		cfg.Db.Host,
+		cfg.Db.Port,
+		cfg.Db.Name,
+	)
+	return dsn
 }

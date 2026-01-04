@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/Kosk0l/TgBotConverter/config"
@@ -14,14 +13,7 @@ import (
 func main() {
 	cfg := config.Load()
 
-	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.Db.User,
-		cfg.Db.Pass,
-		cfg.Db.Host,
-		cfg.Db.Port,
-		cfg.Db.Name,
-	)
+	dsn := config.LoadDsn(cfg)
 
 	m, err := migrate.New("file://migrations", dsn)
 	if err != nil {

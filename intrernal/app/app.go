@@ -9,7 +9,7 @@ import (
 	"github.com/Kosk0l/TgBotConverter/config"
 	"github.com/Kosk0l/TgBotConverter/intrernal/handlers"
 	"github.com/Kosk0l/TgBotConverter/intrernal/storage"
-	userservice "github.com/Kosk0l/TgBotConverter/intrernal/userService"
+	"github.com/Kosk0l/TgBotConverter/intrernal/userService"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -27,24 +27,17 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 
 	// объект постгреса 
-	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		cfg.Db.User,
-		cfg.Db.Pass,
-		cfg.Db.Host,
-		cfg.Db.Port,
-		cfg.Db.Name,
-	)
+	dsn := config.LoadDsn(cfg)
 	pool, err := storage.NewPostgres(ctx, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("error in up storage: %v", err)
 	}
 	
 	// Объект сервиса
-	userservice := userservice.NewService(pool)
+	userService := userservice.NewService(pool)
 
 	// объект хендлера
-	handler := handlers.NewServer(bot, userservice)
+	handler := handlers.NewServer(bot, userService)
 
 	bot.Debug = true
 	log.Printf("\nAuthorized on account %s", bot.Self.UserName)
@@ -67,12 +60,13 @@ func (a *App) Run(ctx context.Context) () {
 	for update := range updates {
 		go func(update telegram.Update) {
 			ctxUpdate, cancel := context.WithTimeout(ctx, 15*time.Second)
-			defer cancel()
+			defer cancel() // выход из горутины
 			a.handler.HandleUpdate(ctxUpdate, update)
 		}(update)
 	}
 }
 
 func (a *App) Stop() () {
-
+	a.bot.StopReceivingUpdates()
+	log.Println("telegram bot stopped")
 }
