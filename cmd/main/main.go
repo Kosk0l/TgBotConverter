@@ -3,13 +3,20 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Kosk0l/TgBotConverter/config"
 	"github.com/Kosk0l/TgBotConverter/intrernal/app"
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := signal.NotifyContext( // root context
+		context.Background(),
+		os.Interrupt,
+		syscall.SIGTERM,
+	)
 	defer cancel()
 
 	cfg := config.Load()

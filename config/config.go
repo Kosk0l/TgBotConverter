@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Postgres
 type DBConfig struct {
 	Host string `env:"DB_HOST" envDefault:"localhost"`
 	Port string `env:"DB_PORT" envDefault:"5433"`
@@ -21,9 +22,16 @@ type TGConfig struct {
 	TOKEN string `env:"TG_TOKEN,required"` // обязано существовать - Parse вернет ошибку
 }
 
+type RedisConfig struct {
+	Addr     string `env:"REDIS_ADDR" envDefault:"localhost:6380"`
+	Password string `env:"REDIS_PASSWORD,required"`
+	DB       int    `env:"REDIS_DB" envDefault:"0"`
+}
+
 type Config struct {
 	Db 	DBConfig
 	App TGConfig
+	Re 	RedisConfig
 }
 
 func Load() (*Config) {
