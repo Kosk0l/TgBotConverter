@@ -11,11 +11,18 @@ services:
       POSTGRES_PASSWORD: qwerty
       POSTGRES_HOST: localhost
       POSTGRES_SSLMODE: disable
+    # volumes:
+    #   - 
     
-  # redis:
-  #   image: redis
-  #   ports:
-  #    - 0:0
+  redis:
+    image: redis
+    container_name: redis 
+    command: redis-server --requirepass qwerty
+    ports:
+     - 6380:6379
+    # volumes:
+    #   - redis_data:/data
+    # command: redis-server --appendonly yes
 
   # backend:
   #   image:
