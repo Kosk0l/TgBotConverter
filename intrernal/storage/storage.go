@@ -10,6 +10,7 @@ import (
 )
 
 //====================================================================================================
+// TODO: тестирование storage
 
 // Взять из БД пользователя по id
 func (p *Postgres) GetById(ctx context.Context, userId int64) (*models.User, error) {

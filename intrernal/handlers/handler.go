@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/Kosk0l/TgBotConverter/intrernal/models"
-	userService "github.com/Kosk0l/TgBotConverter/intrernal/userService"
+	userService "github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 

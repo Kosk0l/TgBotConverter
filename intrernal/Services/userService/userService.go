@@ -3,13 +3,12 @@ package userservice
 import (
 	"context"
 	"fmt"
-
 	"github.com/Kosk0l/TgBotConverter/intrernal/models"
 )
 
 // Контенкст создать в хендлере для сервисов // Контекст не должен жить долго
 type UserRepository interface {
-	GetById(ctx context.Context, userId int64) (*models.User, error) //TODO:
+	GetById(ctx context.Context, userId int64) (*models.User, error)
 	CreareUser(ctx context.Context, user *models.User) (error)
 	UpdateUser(ctx context.Context, user *models.User) (error)
 	UpdateLastSeen(ctx context.Context, userId int64) (error)
@@ -21,7 +20,7 @@ type UserService struct {
 }
 
 // Конструктор
-func NewService(repo UserRepository) (*UserService) {
+func NewUserService(repo UserRepository) (*UserService) {
 	return &UserService{
 		repo: repo,
 	}

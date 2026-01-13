@@ -9,7 +9,7 @@ import (
 	"github.com/Kosk0l/TgBotConverter/config"
 	"github.com/Kosk0l/TgBotConverter/intrernal/handlers"
 	"github.com/Kosk0l/TgBotConverter/intrernal/storage"
-	"github.com/Kosk0l/TgBotConverter/intrernal/userService"
+	"github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -34,7 +34,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 	
 	// Объект сервиса
-	userService := userservice.NewService(pool)
+	userService := userservice.NewUserService(pool)
 
 	// объект хендлера
 	handler := handlers.NewServer(bot, userService)
