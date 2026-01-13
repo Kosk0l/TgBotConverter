@@ -10,12 +10,12 @@ import (
 
 // Postgres
 type DBConfig struct {
-	Host string `env:"DB_HOST" envDefault:"localhost"`
-	Port string `env:"DB_PORT" envDefault:"5433"`
-	User string `env:"DB_USER,required"`
-	Pass string `env:"DB_PASS,required"`
-	Name string `env:"DB_NAME,required"`
-	SSL  string `env:"DB_SSL" envDefault:"disable"`
+	Name string `env:"POSTGRES_DB,required"`
+	User string `env:"POSTGRES_USER,required"`
+	Pass string `env:"POSTGRES_PASSWORD,required"`
+	Host string `env:"POSTGRES_HOST" envDefault:"localhost"`
+	SSL  string `env:"POSTGRES_SSL" envDefault:"disable"`
+	Port string `env:"POSTGRES_PORT" envDefault:"5433"`
 }
 
 type TGConfig struct {
@@ -28,14 +28,24 @@ type RedisConfig struct {
 	DB       int    `env:"REDIS_DB" envDefault:"0"`
 }
 
+type MinioConfig struct {
+	Endpoint 	string 	`env:"MINIO_ENDPOINT,required"`
+	AccessKey 	string 	`env:"MINIO_ROOT_USER,required"`
+	SecretKey 	string 	`env:"MINIO_ROOT_PASSWORD,required"`
+}
+
 type Config struct {
 	Db 	DBConfig
 	App TGConfig
 	Re 	RedisConfig
+	Mi	MinioConfig
 }
 
 func Load() (*Config) {
-	_ = godotenv.Load()
+	err := godotenv.Load() 
+	if err != nil {
+		log.Print("error - godotenv failed up env_file")
+	}
 
 	cfg := Config{}
 	if err := env.Parse(&cfg); err != nil {

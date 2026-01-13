@@ -8,7 +8,7 @@ import (
 
 	"github.com/Kosk0l/TgBotConverter/config"
 	"github.com/Kosk0l/TgBotConverter/intrernal/handlers"
-	"github.com/Kosk0l/TgBotConverter/intrernal/storage"
+	"github.com/Kosk0l/TgBotConverter/intrernal/storage/postgres"
 	"github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -28,7 +28,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 
 	// объект постгреса 
 	dsn := config.LoadDsn(cfg)
-	pool, err := storage.NewPostgres(ctx, dsn)
+	pool, err := postgres.NewPostgres(ctx, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("error in up storage: %v", err)
 	}
