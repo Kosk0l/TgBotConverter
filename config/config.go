@@ -32,6 +32,7 @@ type MinioConfig struct {
 	Endpoint 	string 	`env:"MINIO_ENDPOINT,required"`
 	AccessKey 	string 	`env:"MINIO_ROOT_USER,required"`
 	SecretKey 	string 	`env:"MINIO_ROOT_PASSWORD,required"`
+	Secure 		bool	`env:"MINIO_SECURE" envDefault:"false"`
 }
 
 type Config struct {

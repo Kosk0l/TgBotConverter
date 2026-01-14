@@ -2,10 +2,12 @@ package jobservice
 
 import (
 	"context"
+	"io"
+
 	"github.com/Kosk0l/TgBotConverter/intrernal/models"
 )
 
-// Инверсия зависимостей
+// Абстракция для cache
 type JobRepository interface {
 	SetToList(ctx context.Context, jobId int64) (error)
 	SetToHash(ctx context.Context, job models.Job) (error)
@@ -13,14 +15,25 @@ type JobRepository interface {
 	GetFromHash(ctx context.Context, jobId int64) (*models.Job, error)
 }
 
-// Бизнес-логика для работы с запросами
-type JobService struct {
-	repo JobRepository
+// Абстракция для обработки сырых файлов
+type FileRepository interface {
+	SetObject(ctx context.Context, jobId int64, r io.Reader, size int64, contentType string) (error)
+	GetObject(ctx context.Context, jobId int64) (io.Reader, error)
+	DeleteFile(ctx context.Context, jobId int64) (error)
+	ExistObject(ctx context.Context, jobId int64)(bool, error)
 }
 
-func NewJobService(repo JobRepository) (*JobService) {
+// Бизнес-логика для работы с запросами
+type JobService struct {
+	repo 	 JobRepository
+	fileRepo FileRepository
+}
+
+// Конструктор
+func NewJobService(repo JobRepository, fileRepo FileRepository) (*JobService) {
 	return &JobService{
 		repo: repo,
+		fileRepo: fileRepo,
 	}
 }
 

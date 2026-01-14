@@ -12,14 +12,14 @@ import (
 
 // S3 хранилище
 type Minio struct {
-	m *minio.Client
+	client *minio.Client
+	bucket string
 }
 
 func NewMinio(ctx context.Context, cfg *config.Config, bucket string) (*Minio, error) {
-
-	client, err := minio.New("", &minio.Options{
-		Creds: credentials.NewStaticV4("", "", ""),
-		Secure: false,
+	client, err := minio.New(cfg.Mi.Endpoint, &minio.Options{
+		Creds: credentials.NewStaticV4(cfg.Mi.AccessKey, cfg.Mi.SecretKey, ""),
+		Secure: cfg.Mi.Secure,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error - config up minio:%w", err)
@@ -39,6 +39,11 @@ func NewMinio(ctx context.Context, cfg *config.Config, bucket string) (*Minio, e
 	}
 
 	return &Minio{
-		m: client,
+		client: client,
+		bucket: bucket,
 	}, nil
+}
+
+func objectName(jobID int64) string {
+	return fmt.Sprintf("job_%d", jobID)
 }
