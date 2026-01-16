@@ -2,6 +2,7 @@ package jobservice
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/Kosk0l/TgBotConverter/intrernal/models"
@@ -13,6 +14,8 @@ type JobRepository interface {
 	SetToHash(ctx context.Context, job models.Job) (error)
 	GetFromList(ctx context.Context) (int64, error)
 	GetFromHash(ctx context.Context, jobId int64) (*models.Job, error)
+	DeleteKey(ctx context.Context, jobId int64) (error)
+	SetToListR(ctx context.Context, jobId int64) (error)
 }
 
 // Абстракция для обработки сырых файлов
@@ -41,20 +44,43 @@ func NewJobService(repo JobRepository, fileRepo FileRepository) (*JobService) {
 
 // Создать job 
 func (js *JobService) CreateJob(ctx context.Context, job models.Job) (int64, error) {
+	if err := js.fileRepo.SetObject(ctx, job.JobID, nil, 0, ""); err != nil {
+		return 0, fmt.Errorf("jobservice - error in setobject: %w", err)
+	}
 
-	return 0, nil
+	if err := js.repo.SetToHash(ctx, job); err != nil {
+		js.fileRepo.DeleteFile(ctx, job.JobID)
+		return 0, fmt.Errorf("jobservice - error in settohash: %w", err)
+	}
+
+	if err := js.repo.SetToList(ctx, job.JobID); err != nil {
+		js.fileRepo.DeleteFile(ctx, job.JobID)
+		js.repo.DeleteKey(ctx, job.JobID)
+		//TODO: методы необходимо логировать
+		return 0, fmt.Errorf("jobservice - error in settolist: %w", err)
+	}
+
+	return job.JobID, nil
 }
 
-// Получить job
-func (js *JobService) GetJob(ctx context.Context, jobId int64) (*models.Job, error) {
+// Получить job //TODO: реализовать проверку наличия данных в list
+func (js *JobService) GetJob(ctx context.Context) (*models.Job, error) {
+	jobId, err := js.repo.GetFromList(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("jobservice - error in getjob: %w", err)
+	}
 
-	return &models.Job{
+	//TODO: добавить reader;
+	if _, err := js.fileRepo.GetObject(ctx, jobId); err != nil {
+		js.repo.SetToList(ctx, jobId)
+		return nil, fmt.Errorf("jobservice - error in getobject: %w", err)
+	}
 
-	}, nil
-}
-	
-// Удалить job
-func (js *JobService) DeleteJob(ctx context.Context, jobId int64) (error) {
+	job, err := js.repo.GetFromHash(ctx, jobId)
+	if err != nil {
+		js.repo.SetToList(ctx, jobId)
+		return nil, fmt.Errorf("jobservice - error in gethashdata: %w", err)
+	}
 
-	return nil
+	return job, nil
 }

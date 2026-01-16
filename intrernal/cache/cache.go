@@ -11,8 +11,6 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-//TODO: тестирование redis
-
 // Добавить в list(очередь) jobId
 func (r *RedisSt) SetToList(ctx context.Context, jobId int64) (error) {
 	job := fmt.Sprintf("job:%d", jobId)
@@ -98,4 +96,30 @@ func (r *RedisSt) GetFromHash(ctx context.Context, jobId int64) (*models.Job, er
 		FileTypeTo: values["file_to"],
 		StatusJob: values["status"],
 	}, nil
+}
+
+// Удалить ключ
+func(r *RedisSt) DeleteKey(ctx context.Context, jobId int64) (error) {
+	query := fmt.Sprintf("job:%d", jobId)
+	err := r.rdb.Del(ctx, query).Err()
+	if err != nil {
+		return fmt.Errorf("redis - failed delete key:%w", err)
+	}
+
+	return nil
+}
+
+// Вернуть данные в List справа
+func (r *RedisSt) SetToListR(ctx context.Context, jobId int64) (error) {
+	job := fmt.Sprintf("job:%d", jobId)
+
+	err := r.rdb.RPush(ctx, "queue", job).Err()
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return err
+		}
+		return fmt.Errorf("redis: Rpush(list) job %d failed:%w", jobId, err)
+	}
+
+	return nil
 }
