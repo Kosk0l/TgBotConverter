@@ -8,7 +8,7 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-func(m *Minio) SetObject(ctx context.Context, jobId int64, r io.Reader, size int64, contentType string) (error){
+func(m *Minio) SetObject(ctx context.Context, jobId string, r io.Reader, size int64, contentType string) (error){
 	_, err := m.client.PutObject(ctx, m.bucket, objectName(jobId), r, size, minio.PutObjectOptions{
 		ContentType: contentType,
 	})
@@ -19,7 +19,7 @@ func(m *Minio) SetObject(ctx context.Context, jobId int64, r io.Reader, size int
 	return nil
 }
 
-func (m *Minio) GetObject(ctx context.Context, jobId int64) (io.Reader, error){
+func (m *Minio) GetObject(ctx context.Context, jobId string) (io.Reader, error){
 	obj, err := m.client.GetObject(ctx, m.bucket, objectName(jobId), minio.GetObjectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("minio - error get object:%w", err)
@@ -32,7 +32,7 @@ func (m *Minio) GetObject(ctx context.Context, jobId int64) (io.Reader, error){
 	return obj, nil
 }
 
-func (m *Minio) DeleteObject(ctx context.Context, jobId int64) (error){
+func (m *Minio) DeleteObject(ctx context.Context, jobId string) (error){
 	err := m.client.RemoveObject(ctx, m.bucket, objectName(jobId), minio.RemoveObjectOptions{})
 	if err != nil {
 		return fmt.Errorf("minio - error delete object:%w", err)
@@ -41,7 +41,7 @@ func (m *Minio) DeleteObject(ctx context.Context, jobId int64) (error){
 	return nil
 }
 
-func (m *Minio) ExistObject(ctx context.Context, jobId int64) (bool, error) {
+func (m *Minio) ExistObject(ctx context.Context, jobId string) (bool, error) {
 	_, err := m.client.StatObject(ctx, m.bucket, objectName(jobId), minio.StatObjectOptions{})
 	if err == nil {
 		return true, nil

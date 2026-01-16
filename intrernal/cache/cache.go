@@ -12,15 +12,15 @@ import (
 )
 
 // Добавить в list(очередь) jobId
-func (r *RedisSt) SetToList(ctx context.Context, jobId int64) (error) {
-	job := fmt.Sprintf("job:%d", jobId)
+func (r *RedisSt) SetToList(ctx context.Context, jobId string) (error) {
+	job := fmt.Sprintf("job:%s", jobId)
 
 	err := r.rdb.LPush(ctx, "queue", job).Err()
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return err
 		}
-		return fmt.Errorf("redis: lpush(list) job %d failed:%w", jobId, err)
+		return fmt.Errorf("redis: lpush(list) job %s failed:%w", jobId, err)
 	}
 
 	return nil
@@ -29,7 +29,7 @@ func (r *RedisSt) SetToList(ctx context.Context, jobId int64) (error) {
 
 // Добавить в hash параметры запроса
 func (r *RedisSt) SetToHash(ctx context.Context, job models.Job) (error) {
-	query := fmt.Sprintf("job:%d", job.JobID)
+	query := fmt.Sprintf("job:%s", job.JobID)
 
 	err := r.rdb.HSet(ctx, query,
 		"user_id", job.UserID,
@@ -42,7 +42,7 @@ func (r *RedisSt) SetToHash(ctx context.Context, job models.Job) (error) {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return err
 		}
-		return fmt.Errorf("redis: hset(hash) job %d failed:%w", job.JobID, err)
+		return fmt.Errorf("redis: hset(hash) job %s failed:%w", job.JobID, err)
 	}
 
 	return nil
@@ -50,28 +50,27 @@ func (r *RedisSt) SetToHash(ctx context.Context, job models.Job) (error) {
 
 
 // Получить последний JobId из очереди
-func(r *RedisSt) GetFromList(ctx context.Context) (int64, error) {
+func (r *RedisSt) GetFromList(ctx context.Context) (string, error) {
 	result, err := r.rdb.RPop(ctx, "queue").Result()
 	if err != nil {
-		return 0, fmt.Errorf("redis: failed get job from list: %w", err)
+		if err == redis.Nil {
+			return "", redis.Nil // очередь пуста
+		}
+		return "", fmt.Errorf("redis: rpop failed: %w", err)
 	}
 
-	jobId, err := strconv.ParseInt(strings.TrimPrefix(result, "job:"), 10, 64)
-	if err != nil {
-		return 0, fmt.Errorf("failed parse job_id: %w", err)
-	}
-
+	jobId := strings.TrimPrefix(result, "job:")
 	return jobId, nil
 }
 
 
 // Получить из hash данные запроса
-func (r *RedisSt) GetFromHash(ctx context.Context, jobId int64) (*models.Job, error) {
-	keyQuery := fmt.Sprintf("job:%d", jobId)
+func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*models.Job, error) {
+	keyQuery := fmt.Sprintf("job:%s", jobId)
 
 	values, err := r.rdb.HGetAll(ctx, keyQuery).Result()
 	if err != nil {
-		return nil, fmt.Errorf("redis: failed hgetall job %d: %w", jobId, err)
+		return nil, fmt.Errorf("redis - hgetall job %s failed: %w", jobId, err)
 	}
 
 	if len(values) == 0 {
@@ -89,9 +88,9 @@ func (r *RedisSt) GetFromHash(ctx context.Context, jobId int64) (*models.Job, er
 	}
 
 	return &models.Job{
-		JobID: jobId,
-		UserID: userId,
-		ChatID: chatId,
+		JobID:      jobId,
+		UserID:     userId,
+		ChatID:     chatId,
 		FileTypeIn: values["file_in"],
 		FileTypeTo: values["file_to"],
 		StatusJob: values["status"],
@@ -99,8 +98,8 @@ func (r *RedisSt) GetFromHash(ctx context.Context, jobId int64) (*models.Job, er
 }
 
 // Удалить ключ
-func(r *RedisSt) DeleteKey(ctx context.Context, jobId int64) (error) {
-	query := fmt.Sprintf("job:%d", jobId)
+func(r *RedisSt) DeleteKey(ctx context.Context, jobId string) (error) {
+	query := fmt.Sprintf("job:%s", jobId)
 	err := r.rdb.Del(ctx, query).Err()
 	if err != nil {
 		return fmt.Errorf("redis - failed delete key:%w", err)
@@ -110,15 +109,15 @@ func(r *RedisSt) DeleteKey(ctx context.Context, jobId int64) (error) {
 }
 
 // Вернуть данные в List справа
-func (r *RedisSt) SetToListR(ctx context.Context, jobId int64) (error) {
-	job := fmt.Sprintf("job:%d", jobId)
+func (r *RedisSt) SetToListR(ctx context.Context, jobId string) (error) {
+	job := fmt.Sprintf("job:%s", jobId)
 
 	err := r.rdb.RPush(ctx, "queue", job).Err()
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return err
 		}
-		return fmt.Errorf("redis: Rpush(list) job %d failed:%w", jobId, err)
+		return fmt.Errorf("redis: Rpush(list) job %s failed:%w", jobId, err)
 	}
 
 	return nil

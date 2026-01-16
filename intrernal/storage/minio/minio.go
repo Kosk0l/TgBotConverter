@@ -44,6 +44,6 @@ func NewMinio(ctx context.Context, cfg *config.Config, bucket string) (*Minio, e
 	}, nil
 }
 
-func objectName(jobID int64) string {
-	return fmt.Sprintf("job_%d", jobID)
+func objectName(jobID string) string {
+	return fmt.Sprintf("job_%s", jobID)
 }

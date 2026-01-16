@@ -2,7 +2,7 @@ package models
 
 // domain Job - Redis, List, Hash
 type Job struct {
-	JobID 		int64
+	JobID 		string
 	UserID 		int64
 	ChatID		int64
 	FileTypeIn	string
