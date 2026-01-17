@@ -30,7 +30,8 @@ func (r *RedisSt) SetToList(ctx context.Context, jobId string) (error) {
 // Добавить в hash параметры запроса
 func (r *RedisSt) SetToHash(ctx context.Context, job models.Job) (error) {
 	query := fmt.Sprintf("job:%s", job.JobID)
-
+	job.StatusJob = models.InQueue
+	
 	err := r.rdb.HSet(ctx, query,
 		"user_id", job.UserID,
 		"chat_id", job.ChatID,
@@ -93,9 +94,10 @@ func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*models.Job, e
 		ChatID:     chatId,
 		FileTypeIn: values["file_in"],
 		FileTypeTo: values["file_to"],
-		StatusJob: values["status"],
+		StatusJob: models.ProcessedNow,
 	}, nil
 }
+
 
 // Удалить ключ
 func(r *RedisSt) DeleteKey(ctx context.Context, jobId string) (error) {
@@ -107,6 +109,7 @@ func(r *RedisSt) DeleteKey(ctx context.Context, jobId string) (error) {
 
 	return nil
 }
+
 
 // Вернуть данные в List справа
 func (r *RedisSt) SetToListR(ctx context.Context, jobId string) (error) {

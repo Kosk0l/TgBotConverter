@@ -10,7 +10,7 @@ type Job struct {
 	StatusJob   string
 }
 
-// Константы для статуса
+// Константы для статуса - string
 const (
 	InQueue = "inQueue" 
 	ProcessedNow = "processedNow" 
@@ -18,7 +18,7 @@ const (
 	RedisError = "redisError"
 )
 
-// Константы для файлов
+// Константы для файлов - string
 const (
 	PDF = "PDF"
 	JPG = "JPG"

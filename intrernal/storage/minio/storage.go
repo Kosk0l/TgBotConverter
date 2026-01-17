@@ -8,6 +8,8 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
+
+// Добавить объект
 func(m *Minio) SetObject(ctx context.Context, jobId string, r io.Reader, size int64, contentType string) (error){
 	_, err := m.client.PutObject(ctx, m.bucket, objectName(jobId), r, size, minio.PutObjectOptions{
 		ContentType: contentType,
@@ -19,6 +21,7 @@ func(m *Minio) SetObject(ctx context.Context, jobId string, r io.Reader, size in
 	return nil
 }
 
+// Получить объект
 func (m *Minio) GetObject(ctx context.Context, jobId string) (io.Reader, error){
 	obj, err := m.client.GetObject(ctx, m.bucket, objectName(jobId), minio.GetObjectOptions{})
 	if err != nil {
@@ -32,6 +35,7 @@ func (m *Minio) GetObject(ctx context.Context, jobId string) (io.Reader, error){
 	return obj, nil
 }
 
+// Удалить Объект
 func (m *Minio) DeleteObject(ctx context.Context, jobId string) (error){
 	err := m.client.RemoveObject(ctx, m.bucket, objectName(jobId), minio.RemoveObjectOptions{})
 	if err != nil {
@@ -41,6 +45,7 @@ func (m *Minio) DeleteObject(ctx context.Context, jobId string) (error){
 	return nil
 }
 
+// Проверить наличие объекта
 func (m *Minio) ExistObject(ctx context.Context, jobId string) (bool, error) {
 	_, err := m.client.StatObject(ctx, m.bucket, objectName(jobId), minio.StatObjectOptions{})
 	if err == nil {

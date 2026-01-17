@@ -46,12 +46,14 @@ func NewJobService(repo JobRepository, fileRepo FileRepository) (*JobService) {
 
 // Создать job 
 func (js *JobService) CreateJob(ctx context.Context, job models.Job) (string, error) {
-	job.JobID = uuid.NewString()
+	job.JobID = uuid.NewString() // уникальный id
 
+	// Добавить file
 	if err := js.fileRepo.SetObject(ctx, job.JobID, nil, 0, ""); err != nil {
 		return job.JobID, fmt.Errorf("jobservice - error in setobject: %w", err)
 	}
 
+	// Положить в hash
 	if err := js.repo.SetToHash(ctx, job); err != nil {
 		if err2 := js.fileRepo.DeleteFile(ctx, job.JobID); err2 != nil {
 			log.Printf("rollback error DeleteFile: %v", err2)
@@ -59,6 +61,7 @@ func (js *JobService) CreateJob(ctx context.Context, job models.Job) (string, er
 		return job.JobID, fmt.Errorf("jobservice - error in settohash: %w", err)
 	}
 
+	// Добавить в очередь
 	if err := js.repo.SetToList(ctx, job.JobID); err != nil {
 		if err2 := js.fileRepo.DeleteFile(ctx, job.JobID); err2 != nil {
 			log.Printf("rollback error DeleteFile: %v", err2)
@@ -72,25 +75,27 @@ func (js *JobService) CreateJob(ctx context.Context, job models.Job) (string, er
 	return job.JobID, nil
 }
 
-// Получить job //TODO: реализовать проверку наличия данных в list
+// Получить job
 func (js *JobService) GetJob(ctx context.Context) (*models.Job, error) {
+	// Получить id
 	jobId, err := js.repo.GetFromList(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("jobservice - error in getjob: %w", err)
 	}
 
-	//TODO: добавить reader;
-	if _, err := js.fileRepo.GetObject(ctx, jobId); err != nil {
-		if err2 := js.repo.SetToList(ctx, jobId); err2 != nil {
-			log.Printf("rollback error SetToList: %v", err2)
+	// Получить по id file
+	if _, err := js.fileRepo.GetObject(ctx, jobId); err != nil { //TODO: добавить reader;
+		if err2 := js.repo.SetToListR(ctx, jobId); err2 != nil {
+			log.Printf("rollback error SetToListR: %v", err2)
 		}
 		return nil, fmt.Errorf("jobservice - error in getobject: %w", err)
 	}
 
+	// Получить по id метаданные
 	job, err := js.repo.GetFromHash(ctx, jobId)
 	if err != nil {
-		if err2 := js.repo.SetToList(ctx, jobId); err2 != nil {
-			log.Printf("rollback error SetToList: %v", err2)
+		if err2 := js.repo.SetToListR(ctx, jobId); err2 != nil {
+			log.Printf("rollback error SetToListR: %v", err2)
 		}
 		return nil, fmt.Errorf("jobservice - error in gethashdata: %w", err)
 	}
