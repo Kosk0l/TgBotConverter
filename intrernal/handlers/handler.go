@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"log"
-	"net/http"
 
 	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
 	userService "github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
@@ -13,6 +12,29 @@ import (
 
 // bot - http cliet
 // update - http request // Содержит всю информацию
+
+// Вид json запроса: (все есть в update)
+
+	/*
+	"message":{
+		"message_id":19,
+		"from":{
+			"id":7792217214,
+			"is_bot":false,
+			"first_name":"Николай",
+			"username":"kosk0l",
+			"language_code":"ru"
+		},
+		"chat":{
+			"id":7792217214,
+			"first_name":"Николай",
+			"username":"kosk0l",
+			"type":"private"
+		},
+		"date":1766682293,
+		"text":"В"
+	}
+	*/
 
 // TODO: Дальше можно разрезать по зонам ответственности: ht *HandlerText
 type Handler struct {
@@ -81,14 +103,30 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 	// Получить file
 	file := update.Message.Document
-	//chatID := update.Message.Chat.ID
+	chatID := update.Message.Chat.ID
 	fileUrl, err := h.bot.GetFileDirectURL(file.FileID)
 	if err != nil {
 		log.Printf("handler - failed get file url: %v", err)
 		return
 	}
 
-	//TODO: модель в редис inq
+	InquiryJob := models.Inquiry{
+		FileURL: fileUrl,
+		FileName: file.FileName,
+		ChatId: chatID,
+		Size: int64(file.FileSize),
+		ContentType: file.MimeType,
+	}
+
+	
 
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"В какой тип необходимо преобразовать?"))
 }
+
+//====================================================================================================
+
+// Обработчик текстов
+func (h *Handler) HandleText(ctx context.Context, update telegram.Update) {
+	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"Я принимаю только команды и документы"))
+}
+

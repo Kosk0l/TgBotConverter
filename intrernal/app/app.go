@@ -37,7 +37,7 @@ func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
 	userService := userservice.NewUserService(pool)
 
 	// объект хендлера
-	handler := handlers.NewServer(bot, userService)
+	handler := handlers.NewServer(bot, userService, nil)// TODO: добавить сервис
 
 	bot.Debug = true
 	log.Printf("\nAuthorized on account %s", bot.Self.UserName)
