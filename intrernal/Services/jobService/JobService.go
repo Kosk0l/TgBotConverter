@@ -45,11 +45,11 @@ func NewJobService(repo JobRepository, fileRepo FileRepository) (*JobService) {
 //====================================================================================================
 
 // Создать job 
-func (js *JobService) CreateJob(ctx context.Context, job models.Job) (string, error) {
+func (js *JobService) CreateJob(ctx context.Context, job models.Job, jobObj models.Object) (string, error) {
 	job.JobID = uuid.NewString() // уникальный id
 
 	// Добавить file
-	if err := js.fileRepo.SetObject(ctx, job.JobID, nil, 0, ""); err != nil {
+	if err := js.fileRepo.SetObject(ctx, job.JobID, jobObj.Reader, jobObj.Size, jobObj.ContentType); err != nil {
 		return job.JobID, fmt.Errorf("jobservice - error in setobject: %w", err)
 	}
 

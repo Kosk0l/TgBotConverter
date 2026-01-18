@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"strings"
 
+	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
 	userService "github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
 	"github.com/Kosk0l/TgBotConverter/intrernal/models"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -14,16 +14,18 @@ import (
 // bot - http cliet
 // update - http request // Содержит всю информацию
 
-//
+// TODO: Дальше можно разрезать по зонам ответственности: ht *HandlerText
 type Handler struct {
 	bot *telegram.BotAPI
-	u 	*userService.UserService
+	us 	*userService.UserService
+	js 	*jobservice.JobService
 }
 
-func NewServer(bot *telegram.BotAPI, u *userService.UserService) (*Handler) {
+func NewServer(bot *telegram.BotAPI, us *userService.UserService, js *jobservice.JobService) (*Handler) {
 	return &Handler{
 		bot: bot,
-		u: u,
+		us: us,
+		js: js,
 	}
 }
 
@@ -57,7 +59,7 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 	switch update.Message.Command() {
 	case "start":
 		// Проверка наличия пользователя
-		_, err := h.u.GetByIdService(ctx, update.Message.From.ID)
+		_, err := h.us.GetByIdService(ctx, update.Message.From.ID)
 		if err != nil {
 			// Создание модели
 			var user models.User
@@ -67,7 +69,7 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 			user.LastName = update.Message.From.LastName
 
 			// Создание пользователя
-			h.u.CreateUserService(ctx, &user)
+			h.us.CreateUserService(ctx, &user)
 		}
 		h.bot.Send(telegram.NewMessage(chatID,"Привет! Отправь документ для конвертации."))
 	default:
@@ -79,28 +81,14 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 	// Получить file
 	file := update.Message.Document
-	chatID := update.Message.Chat.ID
-	fileUrl, _ := h.bot.GetFileDirectURL(file.FileID)
-
-	// стрим байтов
-	resp, err := http.Get(fileUrl) 
+	//chatID := update.Message.Chat.ID
+	fileUrl, err := h.bot.GetFileDirectURL(file.FileID)
 	if err != nil {
-		log.Printf("handler - failed get file: %s", err)
-		return 
+		log.Printf("handler - failed get file url: %v", err)
+		return
 	}
-	defer resp.Body.Close() // Закрыть поток данных
 
-	switch {
-	case strings.HasSuffix(file.FileName, ".pdf"):
-		h.handlePDF(ctx, update)
+	//TODO: модель в редис inq
 
-	case strings.HasSuffix(file.FileName, ".docx"):
-		h.handleDOCX(ctx, update)
-
-	case strings.HasSuffix(file.FileName, ".xlsx"):
-		h.handleXLSX(ctx, update)
-
-	default:
-		h.bot.Send(telegram.NewMessage(chatID, "Этот тип файла пока не поддерживается"))
-	}
+	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"В какой тип необходимо преобразовать?"))
 }

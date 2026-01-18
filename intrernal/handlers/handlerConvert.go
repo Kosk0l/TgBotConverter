@@ -13,16 +13,6 @@ func (h *Handler) handlePDF(ctx context.Context, update telegram.Update) {
 	// TODO: реализовать API бизнес-логику
 }
 
-func (h *Handler) handleDOCX(ctx context.Context, update telegram.Update) {
-	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID, "PDF получен"))
-	// TODO: реализовать API бизнес-логику
-}
-
-func (h *Handler) handleXLSX(ctx context.Context, update telegram.Update) {
-	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID, "PDF получен"))
-	// TODO: реализовать API бизнес-логику
-}
-
 func (h *Handler) HandleText(ctx context.Context, update telegram.Update) {
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"Я принимаю только команды и документы"))
 }
