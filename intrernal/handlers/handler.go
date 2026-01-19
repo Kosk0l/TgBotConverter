@@ -110,7 +110,7 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 		return
 	}
 
-	InquiryJob := domains.Inquiry{
+	InquiryJob := domains.State{
 		FileURL: fileUrl,
 		FileName: file.FileName,
 		ChatId: chatID,
