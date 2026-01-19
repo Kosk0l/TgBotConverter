@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	"github.com/Kosk0l/TgBotConverter/intrernal/models"
+	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -13,13 +13,13 @@ import (
 // TODO: тестирование storage
 
 // Взять из БД пользователя по id
-func (p *Postgres) GetById(ctx context.Context, userId int64) (*models.User, error) {
+func (p *Postgres) GetById(ctx context.Context, userId int64) (*domains.User, error) {
 	query := `
 		SELECT userName, firstName, lastName, createdAt, lastSeenAt
 		FROM users WHERE id = $1;
 	`
 
-	var user models.User
+	var user domains.User
 	err := p.pool.QueryRow(ctx, query, userId).Scan(
 		&user.UserName, 
 		&user.FirstName,
@@ -40,7 +40,7 @@ func (p *Postgres) GetById(ctx context.Context, userId int64) (*models.User, err
 
 
 // Создать пользователя
-func (p *Postgres) CreareUser(ctx context.Context, user *models.User) (error){
+func (p *Postgres) CreareUser(ctx context.Context, user *domains.User) (error){
 	query := `
 		INSERT INTO users (id, userName, firstName, lastName, createdAt, lastSeenAt) VALUES
 		($1, $2, $3, $4, $5, $6);
@@ -60,7 +60,7 @@ func (p *Postgres) CreareUser(ctx context.Context, user *models.User) (error){
 
 
 // Обновить Пользователя
-func (p *Postgres) UpdateUser(ctx context.Context, user *models.User) (error){
+func (p *Postgres) UpdateUser(ctx context.Context, user *domains.User) (error){
 	query := `
 		UPDATE users
 		SET userName = $1, firstName = $2, lastName = $3

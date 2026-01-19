@@ -6,16 +6,16 @@ import (
 	"io"
 	"log"
 
-	"github.com/Kosk0l/TgBotConverter/intrernal/models"
+	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
 	"github.com/google/uuid"
 )
 
 // Абстракция для cache
 type JobRepository interface {
 	SetToList(ctx context.Context, jobId string) (error)
-	SetToHash(ctx context.Context, job models.Job) (error)
+	SetToHash(ctx context.Context, job domains.Job) (error)
 	GetFromList(ctx context.Context) (string, error)
-	GetFromHash(ctx context.Context, jobId string) (*models.Job, error)
+	GetFromHash(ctx context.Context, jobId string) (*domains.Job, error)
 	DeleteKey(ctx context.Context, jobId string) (error)
 	SetToListR(ctx context.Context, jobId string) (error)
 }
@@ -45,7 +45,7 @@ func NewJobService(repo JobRepository, fileRepo FileRepository) (*JobService) {
 //====================================================================================================
 
 // Создать job 
-func (js *JobService) CreateJob(ctx context.Context, job models.Job, jobObj models.Object) (string, error) {
+func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj domains.Object) (string, error) {
 	job.JobID = uuid.NewString() // уникальный id
 
 	// Добавить file
@@ -76,7 +76,7 @@ func (js *JobService) CreateJob(ctx context.Context, job models.Job, jobObj mode
 }
 
 // Получить job
-func (js *JobService) GetJob(ctx context.Context) (*models.Job, error) {
+func (js *JobService) GetJob(ctx context.Context) (*domains.Job, error) {
 	// Получить id
 	jobId, err := js.repo.GetFromList(ctx)
 	if err != nil {

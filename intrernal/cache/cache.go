@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Kosk0l/TgBotConverter/intrernal/models"
+	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -28,9 +28,9 @@ func (r *RedisSt) SetToList(ctx context.Context, jobId string) (error) {
 
 
 // Добавить в hash параметры запроса
-func (r *RedisSt) SetToHash(ctx context.Context, job models.Job) (error) {
+func (r *RedisSt) SetToHash(ctx context.Context, job domains.Job) (error) {
 	query := fmt.Sprintf("job:%s", job.JobID)
-	job.StatusJob = models.InQueue
+	//job.StatusJob = domains.InQueue
 	
 	err := r.rdb.HSet(ctx, query,
 		"user_id", job.UserID,
@@ -66,7 +66,7 @@ func (r *RedisSt) GetFromList(ctx context.Context) (string, error) {
 
 
 // Получить из hash данные запроса
-func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*models.Job, error) {
+func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*domains.Job, error) {
 	keyQuery := fmt.Sprintf("job:%s", jobId)
 
 	values, err := r.rdb.HGetAll(ctx, keyQuery).Result()
@@ -88,13 +88,13 @@ func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*models.Job, e
 		return nil, fmt.Errorf("error parse chat_id: %w", err)
 	}
 
-	return &models.Job{
+	return &domains.Job{
 		JobID:      jobId,
 		UserID:     userId,
 		ChatID:     chatId,
 		FileTypeIn: values["file_in"],
 		FileTypeTo: values["file_to"],
-		StatusJob: models.ProcessedNow,
+		StatusJob: values["status"], //TODO: редактировать статус
 	}, nil
 }
 
