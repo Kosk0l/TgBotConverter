@@ -2,7 +2,7 @@ package domains
 
 import "time"
 
-// domain services Пользователя
+// Структура Пользователя в БД
 type User struct {
 	ID        int64
 	UserName  string

@@ -1,6 +1,6 @@
 package domains
 
-// domain Job - Redis, List, Hash
+// Job - Redis: List, Hash
 type Job struct {
 	JobID 		string
 	UserID 		int64

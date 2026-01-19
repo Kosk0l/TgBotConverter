@@ -1,5 +1,6 @@
 package domains
 
+// Структура сообщения пользователя
 type State struct {
 	FileURL     string
     FileName    string
