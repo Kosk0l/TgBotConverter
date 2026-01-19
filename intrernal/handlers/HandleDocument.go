@@ -19,7 +19,7 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 		return
 	}
 
-	InquiryJob := domains.State{
+	State := domains.State{
 		FileURL: fileUrl,
 		FileName: file.FileName,
 		ChatId: chatID,
@@ -27,7 +27,7 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 		ContentType: file.MimeType,
 	}
 
-	//TODO:
+	
 
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"В какой тип необходимо преобразовать?"))
 }

@@ -33,6 +33,8 @@ import (
 	}
 	*/
 
+//====================================================================================================
+
 // TODO: Дальше можно разрезать по зонам ответственности: ht *HandlerText
 type Handler struct {
 	bot *telegram.BotAPI
@@ -40,6 +42,7 @@ type Handler struct {
 	js 	*jobservice.JobService
 }
 
+// Конструктор
 func NewServer(bot *telegram.BotAPI, us *userService.UserService, js *jobservice.JobService) (*Handler) {
 	return &Handler{
 		bot: bot,
@@ -50,6 +53,7 @@ func NewServer(bot *telegram.BotAPI, us *userService.UserService, js *jobservice
 
 //====================================================================================================
 
+// Распределяет по типам сообщения
 func (h *Handler) HandleUpdate(ctx context.Context, update telegram.Update) {
 	if update.Message == nil {
 		return

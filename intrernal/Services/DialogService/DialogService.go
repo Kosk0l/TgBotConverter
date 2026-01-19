@@ -1,9 +1,7 @@
-package pendingservice
+package Dialogservice
 
 import (
 	"context"
-
-	
 )
 
 // Абстракция для cache
@@ -14,25 +12,25 @@ type DialogRepository interface {
 }
 
 // Сервис управления состояниями диалога
-type DialogStateService struct {
+type DialogService struct {
 	pr	DialogRepository
 }
 
 // Конструктор
-func NewDialogStateService(pr DialogRepository) (*DialogStateService) {
-	return &DialogStateService{
+func NewDialogService(pr DialogRepository) (*DialogService) {
+	return &DialogService{
 		pr: pr,
 	}
 }
 
 //====================================================================================================
 
-func (p *DialogStateService) SetState() (error) {
+func (p *DialogService) SetState() (error) {
 
 	return nil
 }
 
-func (p *DialogStateService) GetState() (error) {
+func (p *DialogService) GetState() (error) {
 
 	return nil
 }

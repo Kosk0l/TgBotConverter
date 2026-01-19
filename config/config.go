@@ -42,7 +42,7 @@ type Config struct {
 	Mi	MinioConfig
 }
 
-func Load() (*Config) {
+func Load() (Config) {
 	err := godotenv.Load() 
 	if err != nil {
 		log.Print("error - godotenv failed up env_file")
@@ -53,12 +53,12 @@ func Load() (*Config) {
 		log.Fatal(err)
 	}
 
-	return &cfg
+	return cfg
 }
 
 //====================================================================================================
 
-func LoadDsn(cfg *Config) (string) {
+func LoadDsn(cfg Config) (string) {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cfg.Db.User,

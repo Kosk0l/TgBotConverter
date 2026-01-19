@@ -7,4 +7,11 @@ type State struct {
 	ChatId 		int64
     Size        int64
 	ContentType string
+	// status 		status
 }
+
+// type status string
+
+// const (
+// 	ok status = "OK"
+// )

@@ -19,7 +19,7 @@ type App struct {
 }
 
 // Конструктор
-func NewApp(ctx context.Context, cfg *config.Config) (*App, error) {
+func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 	// объект бот
 	bot, err := telegram.NewBotAPI(cfg.App.TOKEN)
 	if err != nil {
