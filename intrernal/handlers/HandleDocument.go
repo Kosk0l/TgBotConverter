@@ -20,9 +20,10 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 	}
 
 	State := domains.State{
+		ChatId: chatID,
+		Step: domains.WaitingTargetType,
 		FileURL: fileUrl,
 		FileName: file.FileName,
-		ChatId: chatID,
 		Size: int64(file.FileSize),
 		ContentType: file.MimeType,
 	}

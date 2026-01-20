@@ -2,16 +2,18 @@ package domains
 
 // Структура сообщения пользователя
 type State struct {
+	ChatId 		int64
+	Step 		Step
+
 	FileURL     string
     FileName    string
-	ChatId 		int64
     Size        int64
 	ContentType string
-	// status 		status
 }
 
-// type status string
+type Step string
 
-// const (
-// 	ok status = "OK"
-// )
+const (
+	WaitingTargetType Step = "waiting_target_type"
+	//..
+)

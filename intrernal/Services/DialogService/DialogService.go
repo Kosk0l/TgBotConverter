@@ -2,34 +2,39 @@ package Dialogservice
 
 import (
 	"context"
+
+	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
 )
 
 // Абстракция для cache
 type DialogRepository interface {
-	SetInquiry(ctx context.Context,) (error)
-	GetInquiry(ctx context.Context, fileUrl string) (error)
-	DeleteInquiry(ctx context.Context, fileUrl string) (error)
+	SetStateRepo(ctx context.Context, state domains.State) (error)
+	GetStateRepo(ctx context.Context, fileUrl string) (*domains.State, error)
+	DeleteStateRepo(ctx context.Context, fileUrl string) (error)
 }
 
 // Сервис управления состояниями диалога
 type DialogService struct {
-	pr	DialogRepository
+	dr	DialogRepository
 }
 
 // Конструктор
-func NewDialogService(pr DialogRepository) (*DialogService) {
+func NewDialogService(dr DialogRepository) (*DialogService) {
 	return &DialogService{
-		pr: pr,
+		dr: dr,
 	}
 }
 
 //====================================================================================================
 
-func (p *DialogService) SetState() (error) {
+// Создать сосотояние
+func (p *DialogService) SetState(ctx context.Context, state domains.State) (error) {
+
 
 	return nil
 }
 
+// Получить состояние
 func (p *DialogService) GetState() (error) {
 
 	return nil
