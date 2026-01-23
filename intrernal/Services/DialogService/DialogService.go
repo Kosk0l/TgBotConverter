@@ -9,8 +9,8 @@ import (
 // Абстракция для cache
 type DialogRepository interface {
 	SetStateRepo(ctx context.Context, state domains.State) (error)
-	GetStateRepo(ctx context.Context, fileUrl string) (*domains.State, error)
-	DeleteStateRepo(ctx context.Context, fileUrl string) (error)
+	GetStateRepo(ctx context.Context, chatId int64) (*domains.State, error)
+	DeleteStateRepo(ctx context.Context, chatId int64) (error)
 }
 
 // Сервис управления состояниями диалога
@@ -27,7 +27,7 @@ func NewDialogService(dr DialogRepository) (*DialogService) {
 
 //====================================================================================================
 
-// Создать сосотояние
+// Создать состояние
 func (p *DialogService) SetState(ctx context.Context, state domains.State) (error) {
 
 
@@ -35,7 +35,10 @@ func (p *DialogService) SetState(ctx context.Context, state domains.State) (erro
 }
 
 // Получить состояние
-func (p *DialogService) GetState() (error) {
+func (p *DialogService) GetState(ctx context.Context, chatId int64) (*domains.State, error) {
+	//TODO: по chatId получить состояние
 
-	return nil
+	return &domains.State{
+
+	}, nil
 }
