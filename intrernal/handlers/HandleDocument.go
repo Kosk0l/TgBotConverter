@@ -12,15 +12,16 @@ import (
 func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 	// Получить file
 	file := update.Message.Document
-	chatID := update.Message.Chat.ID
 	fileUrl, err := h.bot.GetFileDirectURL(file.FileID)
 	if err != nil {
 		log.Printf("handler - failed get file url: %v", err)
 		return
 	}
 
-	State := domains.State{
-		ChatId: chatID,
+	// создать состояние
+	state := domains.State{
+		ChatId: update.Message.Chat.ID,
+		UserId: update.Message.From.ID,
 		Step: domains.WaitingTargetType,
 		FileURL: fileUrl,
 		FileName: file.FileName,
@@ -28,7 +29,10 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 		ContentType: file.MimeType,
 	}
 
-	
-
+	// Бизнес-логика - добавить состояние
+	if err := h.ds.SetState(ctx, state); err != nil {
+		log.Printf("handler - failed setstate service: %v", err)
+		return
+	}
 	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"В какой тип необходимо преобразовать?"))
 }

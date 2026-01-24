@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+
+	Dialogservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/DialogService"
 	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
 	userService "github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -12,7 +14,7 @@ import (
 
 // Вид json запроса: (все есть в update)
 
-	/*
+/*
 	"message":{
 		"message_id":19,
 		"from":{
@@ -31,7 +33,7 @@ import (
 		"date":1766682293,
 		"text":"В"
 	}
-	*/
+*/
 
 //====================================================================================================
 
@@ -40,6 +42,7 @@ type Handler struct {
 	bot *telegram.BotAPI
 	us 	*userService.UserService
 	js 	*jobservice.JobService
+	ds 	*Dialogservice.DialogService
 }
 
 // Конструктор
