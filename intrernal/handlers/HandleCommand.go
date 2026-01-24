@@ -15,12 +15,15 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 		// Проверка наличия пользователя
 		_, err := h.us.GetByIdService(ctx, update.Message.From.ID)
 		if err != nil {
-			// Создание модели
-			var user domains.User
-			user.ID = update.Message.From.ID
-			user.UserName = update.Message.From.UserName
-			user.FirstName = update.Message.From.FirstName
-			user.LastName = update.Message.From.LastName
+			//TODO: ввести error.Is и на него накинуть условие и выполнение
+
+			// Создание domain
+			user := domains.User{
+				ID: update.Message.From.ID,
+				UserName: update.Message.From.UserName,
+				FirstName: update.Message.From.FirstName,
+				LastName: update.Message.From.LastName,
+			}
 
 			// Создание пользователя
 			h.us.CreateUserService(ctx, &user)
