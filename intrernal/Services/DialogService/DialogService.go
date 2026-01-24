@@ -2,6 +2,7 @@ package Dialogservice
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
 )
@@ -29,16 +30,25 @@ func NewDialogService(dr DialogRepository) (*DialogService) {
 
 // Создать состояние
 func (p *DialogService) SetState(ctx context.Context, state domains.State) (error) {
-	
+	err := p.dr.SetStateRepo(ctx, state)
+	if err != nil {
+		return fmt.Errorf("dialogservice - error setstate: %w", err)
+	}
 
 	return nil
 }
 
-// Получить состояние
+// Получить состояние 
 func (p *DialogService) GetState(ctx context.Context, chatId int64) (*domains.State, error) {
-	//TODO: по chatId получить состояние
+	state, err := p.dr.GetStateRepo(ctx, chatId)
+	if err != nil {
+		return nil, fmt.Errorf("dialogservice - error getstate: %w", err)
+	}
 
-	return &domains.State{
+	// TODO: потом вынести delete в отдельный метод
+	if err := p.dr.DeleteStateRepo(ctx, chatId); err != nil {
+		return state, fmt.Errorf("dialogservice - error getstate: %w", err)
+	}
 
-	}, nil
+	return state, nil
 }

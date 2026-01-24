@@ -17,11 +17,13 @@ import (
 func (r *RedisSt) SetStateRepo(ctx context.Context, state domains.State) (error) {
 	keyQuery := "chat:" + strconv.FormatInt(state.ChatId, 10)
 
+	// Проверить id
 	if state.ChatId == 0 {
 		return errors.New("chatId is required")
 	}
 
 	pipe := r.rdb.TxPipeline() // начало пайплайна
+	// Добавить hash
 	pipe.HSet(ctx, keyQuery,
 		"user_id", state.UserId,
 		"step", state.Step,
@@ -30,8 +32,9 @@ func (r *RedisSt) SetStateRepo(ctx context.Context, state domains.State) (error)
 		"size", state.Size,
 		"content_type", state.ContentType,
 	)
-	pipe.Expire(ctx, keyQuery, 10*time.Minute).Err()
-	_, err := pipe.Exec(ctx)
+	// добавить таймер
+	pipe.Expire(ctx, keyQuery, 10*time.Minute).Err() 
+	_, err := pipe.Exec(ctx) // конец пайплайна
 	if err != nil {
 		return fmt.Errorf("redis - error pipline: %w", err)
 	}
@@ -54,11 +57,13 @@ func (r *RedisSt) GetStateRepo(ctx context.Context, chatId int64) (*domains.Stat
 		return nil, redis.Nil
 	}
 
+	// Конвертация size
 	size, err := strconv.ParseInt(values["size"], 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("error parse size: %w", err)
 	}
 
+	// конвертация userId
 	userId, err := strconv.ParseInt(values["user_id"], 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("error parse user_id: %w", err)
@@ -79,6 +84,7 @@ func (r *RedisSt) GetStateRepo(ctx context.Context, chatId int64) (*domains.Stat
 func (r *RedisSt) DeleteStateRepo(ctx context.Context, chatId int64) (error) {
 	keyQuery := "chat:" + strconv.FormatInt(chatId, 10)
 
+	// Удалить ключ
 	err := r.rdb.Del(ctx, keyQuery).Err()
 	if err != nil {
 		return fmt.Errorf("redis - failed delete key:%w", err)
