@@ -29,7 +29,7 @@ func NewDialogService(dr DialogRepository) (*DialogService) {
 
 // Создать состояние
 func (p *DialogService) SetState(ctx context.Context, state domains.State) (error) {
-
+	
 
 	return nil
 }

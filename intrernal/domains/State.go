@@ -3,6 +3,7 @@ package domains
 // Структура сообщения пользователя
 type State struct {
 	ChatId 		int64
+	UserId		int64
 	Step 		Step
 
 	FileURL     string

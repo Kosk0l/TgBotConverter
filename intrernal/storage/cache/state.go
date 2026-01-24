@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	//"time"
+
 	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
 	"github.com/redis/go-redis/v9"
 )
@@ -15,19 +17,23 @@ import (
 func (r *RedisSt) SetStateRepo(ctx context.Context, state domains.State) (error) {
 	keyQuery := "chat:" + strconv.FormatInt(state.ChatId, 10)
 
-	err := r.rdb.HSet(ctx, keyQuery, 
+	if state.ChatId == 0 {
+		return errors.New("chatId is required")
+	}
+
+	pipe := r.rdb.TxPipeline() // начало пайплайна
+	pipe.HSet(ctx, keyQuery,
+		"user_id", state.UserId,
 		"step", state.Step,
 		"file_url", state.FileURL,
 		"file_name", state.FileName,
 		"size", state.Size,
 		"content_type", state.ContentType,
-		10*time.Minute,
-	).Err()
+	)
+	pipe.Expire(ctx, keyQuery, 10*time.Minute).Err()
+	_, err := pipe.Exec(ctx)
 	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return err
-		}
-		return fmt.Errorf("redis - error set state: %w", err)
+		return fmt.Errorf("redis - error pipline: %w", err)
 	}
 
 	return nil
@@ -53,8 +59,14 @@ func (r *RedisSt) GetStateRepo(ctx context.Context, chatId int64) (*domains.Stat
 		return nil, fmt.Errorf("error parse size: %w", err)
 	}
 
+	userId, err := strconv.ParseInt(values["user_id"], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parse user_id: %w", err)
+	}
+
 	return &domains.State{
 		ChatId: chatId,
+		UserId: userId,
 		Step: domains.Step(values["step"]),
 		FileURL: values["file_url"],
 		FileName: values["file_name"],
