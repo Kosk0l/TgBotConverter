@@ -31,7 +31,7 @@ func NewUserService(repo UserRepository) (*UserService) {
 func (u *UserService) GetByIdService(ctx context.Context, userId int64) (*domains.User, error) {
 	user, err :=u.repo.GetById(ctx, userId)
 	if err != nil {
-		return nil, fmt.Errorf("Bad get by id: %v", err)
+		return nil, fmt.Errorf("Bad get by id: %w", err)
 	}
 
 	return user, nil
@@ -40,7 +40,7 @@ func (u *UserService) GetByIdService(ctx context.Context, userId int64) (*domain
 func (u *UserService) CreateUserService(ctx context.Context, user *domains.User) (error) {
 	err := u.repo.CreareUser(ctx, user)
 	if err != nil {
-		return fmt.Errorf("error in create: %v", err)
+		return fmt.Errorf("error in create: %w", err)
 	}
 
 	return nil
@@ -49,7 +49,7 @@ func (u *UserService) CreateUserService(ctx context.Context, user *domains.User)
 func (u *UserService) UpdateUserService(ctx context.Context, user *domains.User) (error) {
 	err := u.repo.UpdateUser(ctx, user)
 	if err != nil {
-		return fmt.Errorf("Bad update: %v", err)
+		return fmt.Errorf("Bad update: %w", err)
 	}
 
 	return nil
@@ -58,7 +58,7 @@ func (u *UserService) UpdateUserService(ctx context.Context, user *domains.User)
 func (u *UserService) UpdateLastSeenService(ctx context.Context, userId int64) (error) {
 	err := u.repo.UpdateLastSeen(ctx, userId)
 	if err != nil {
-		return fmt.Errorf("bad update last seen : %v", err)
+		return fmt.Errorf("bad update last seen : %w", err)
 	}
 
 	return nil
@@ -67,7 +67,7 @@ func (u *UserService) UpdateLastSeenService(ctx context.Context, userId int64) (
 func (u *UserService) DeleteUserService(ctx context.Context, userId int64) (error) {
 	err := u.repo.DeleteUser(ctx,userId)
 	if err != nil {
-		return fmt.Errorf("bad delete: %v", err)
+		return fmt.Errorf("bad delete: %w", err)
 	}
 
 	return nil

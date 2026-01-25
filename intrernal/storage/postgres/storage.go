@@ -48,7 +48,7 @@ func (p *Postgres) CreareUser(ctx context.Context, user *domains.User) (error){
 	t := time.Now()
 	cmd, err := p.pool.Exec(ctx, query, user.ID, user.UserName, user.FirstName, user.LastName, t, t)
 	if err != nil {
-		return fmt.Errorf("error in create user %v", err)
+		return fmt.Errorf("error in create user %w", err)
 	}
 
 	if cmd.RowsAffected() == 0 {
@@ -69,7 +69,7 @@ func (p *Postgres) UpdateUser(ctx context.Context, user *domains.User) (error){
 
 	cmd, err := p.pool.Exec(ctx, query, user.UserName, user.FirstName, user.LastName, user.ID)
 	if err != nil {
-		return fmt.Errorf("error in update user %v", err)
+		return fmt.Errorf("error in update user %w", err)
 	}
 
 	if cmd.RowsAffected() == 0 {
@@ -91,7 +91,7 @@ func (p *Postgres) UpdateLastSeen(ctx context.Context, userId int64) (error) {
 	NewSeen := time.Now()
 	cmd, err := p.pool.Exec(ctx, query, NewSeen, userId)
 	if err != nil {
-		return fmt.Errorf("error in update seen user %v", err)
+		return fmt.Errorf("error in update seen user %w", err)
 	}
 
 	if cmd.RowsAffected() == 0 {
@@ -110,7 +110,7 @@ func (p *Postgres) DeleteUser(ctx context.Context, userid int64) (error) {
 
 	cmd, err := p.pool.Exec(ctx, query, userid)
 	if err != nil {
-		return fmt.Errorf("error in update seen user %v", err)
+		return fmt.Errorf("error in update seen user %w", err)
 	}
 
 	if cmd.RowsAffected() == 0 {
