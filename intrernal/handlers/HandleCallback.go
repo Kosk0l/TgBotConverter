@@ -14,9 +14,6 @@ func (h *Handler) HandleCallBack(ctx context.Context, update telegram.Update) ()
 	cb := update.CallbackQuery
 	chatId := cb.Message.Chat.ID
 
-	// Логирование нажатия
-	log.Printf("Callback received: %s", cb.Data)
-
 	// Получим состояние
 	state, err := h.ds.GetState(ctx, chatId) 
 	if err != nil {
