@@ -71,6 +71,7 @@ func (a *App) Run(ctx context.Context) () {
 	// Настраиваем получение апдейтов
 	u := telegram.NewUpdate(0)
 	u.Timeout = 30
+	u.AllowedUpdates = []string{"message", "callback_query"}
 
 	// канал чтения из апи тг
 	updates := a.bot.GetUpdatesChan(u)

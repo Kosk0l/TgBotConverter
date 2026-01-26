@@ -14,6 +14,9 @@ func (h *Handler) HandleCallBack(ctx context.Context, update telegram.Update) ()
 	cb := update.CallbackQuery
 	chatId := cb.Message.Chat.ID
 
+	// Логирование нажатия
+	log.Printf("Callback received: %s", cb.Data)
+
 	// Получим состояние
 	state, err := h.ds.GetState(ctx, chatId) 
 	if err != nil {
@@ -26,15 +29,16 @@ func (h *Handler) HandleCallBack(ctx context.Context, update telegram.Update) ()
 		ChatID: chatId,
 	}
 
-	resp, err := http.Get(state.FileURL)
+	data, err := http.Get(state.FileURL)
 	if err != nil {
 		log.Printf("handler - failed http get file: %v", err)
 		h.bot.Request(telegram.NewCallback(cb.ID, "Ошибка"))
 		return
 	}
+	defer data.Body.Close()
 
 	obj := domains.Object{
-		Reader: resp.Body,
+		Reader: data.Body,
 		Size: state.Size,
 		ContentType: state.ContentType,
 	}
@@ -47,7 +51,7 @@ func (h *Handler) HandleCallBack(ctx context.Context, update telegram.Update) ()
 		job.FileTypeTo = domains.Docx
 	case "to:jpeg":
 		job.FileTypeTo = domains.Jpeg
-	case "to:xlxs":
+	case "to:xlsx":
 		job.FileTypeTo = domains.Xlsx
 	default:
 		h.bot.Request(telegram.NewCallback(cb.ID, "Неизвестный формат на данный момент"))
@@ -61,5 +65,6 @@ func (h *Handler) HandleCallBack(ctx context.Context, update telegram.Update) ()
 		return
 	}
 
-	h.bot.Request(telegram.NewCallback(cb.ID, fmt.Sprintf("Задача %s в очередь", jobId)))
+	h.bot.Request(telegram.NewCallback(cb.ID, fmt.Sprintf("%s успешно", jobId)))
+	h.bot.Send(telegram.NewMessage(chatId,"Добавили в очередь выполнения"))
 }

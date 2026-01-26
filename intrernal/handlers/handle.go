@@ -59,6 +59,11 @@ func NewServer(bot *telegram.BotAPI, us *userService.UserService, js *jobservice
 
 // Распределяет по типам сообщения
 func (h *Handler) HandleUpdate(ctx context.Context, update telegram.Update) {
+	if update.CallbackQuery != nil {
+		h.HandleCallBack(ctx, update)
+		return
+	}
+	
 	if update.Message == nil {
 		return
 	}

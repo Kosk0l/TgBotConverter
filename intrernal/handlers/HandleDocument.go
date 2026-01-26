@@ -10,9 +10,6 @@ import (
 
 // Хендлер документов
 func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
-	if update.Message == nil || update.Message.Document == nil {
-		return
-	}
 
 	// Получить file
 	file := update.Message.Document
