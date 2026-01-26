@@ -32,10 +32,10 @@ services:
       - "9001:9001"   # Web UI
     environment:
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: qwerty
+      MINIO_ROOT_PASSWORD: qwertyqwerty
     # volumes:
     #   - minio_data:/data
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9003"
 
   # backend:
     # image:

@@ -46,11 +46,12 @@ type Handler struct {
 }
 
 // Конструктор
-func NewServer(bot *telegram.BotAPI, us *userService.UserService, js *jobservice.JobService) (*Handler) {
+func NewServer(bot *telegram.BotAPI, us *userService.UserService, js *jobservice.JobService, ds *Dialogservice.DialogService) (*Handler) {
 	return &Handler{
 		bot: bot,
 		us: us,
 		js: js,
+		ds: ds,
 	}
 }
 

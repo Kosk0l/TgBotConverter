@@ -12,7 +12,7 @@ type RedisSt struct {
 	rdb *redis.Client
 }
 
-func NewRedis(ctx context.Context, cfg *config.Config) (*RedisSt, error) {
+func NewRedis(ctx context.Context, cfg config.Config) (*RedisSt, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr: cfg.Re.Addr,
 		Password: cfg.Re.Password,

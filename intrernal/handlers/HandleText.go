@@ -7,5 +7,5 @@ import(
 
 // Обработчик текстов
 func (h *Handler) HandleText(ctx context.Context, update telegram.Update) {
-	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"Я принимаю только команды и документы"))
+	
 }

@@ -7,9 +7,13 @@ import (
 	"time"
 
 	"github.com/Kosk0l/TgBotConverter/config"
-	"github.com/Kosk0l/TgBotConverter/intrernal/handlers"
-	"github.com/Kosk0l/TgBotConverter/intrernal/storage/postgres"
+	Dialogservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/DialogService"
+	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
 	"github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
+	"github.com/Kosk0l/TgBotConverter/intrernal/handlers"
+	"github.com/Kosk0l/TgBotConverter/intrernal/storage/cache"
+	"github.com/Kosk0l/TgBotConverter/intrernal/storage/minio"
+	"github.com/Kosk0l/TgBotConverter/intrernal/storage/postgres"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -20,24 +24,39 @@ type App struct {
 
 // Конструктор
 func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
-	// объект бот
+
+	// объект бота телеграмм
 	bot, err := telegram.NewBotAPI(cfg.App.TOKEN)
 	if err != nil {
-		return nil, fmt.Errorf("error in up telegram token(newapp constructor): %v", err)
+		return nil, fmt.Errorf("error in up telegram token(newapp constructor): %w", err)
 	}
 
 	// объект постгреса 
 	dsn := config.LoadDsn(cfg)
 	pool, err := postgres.NewPostgres(ctx, dsn)
 	if err != nil {
-		return nil, fmt.Errorf("error in up storage: %v", err)
+		return nil, fmt.Errorf("error in up storage: %w", err)
+	}
+
+	// объект редиса
+	cache, err := cache.NewRedis(ctx, cfg) 
+	if err != nil {
+		return nil, fmt.Errorf("error in up redis: %w", err)
+	}
+
+	// объект минио
+	minio, err := minio.NewMinio(ctx, cfg, "files") 
+	if err != nil {
+		return nil ,fmt.Errorf("error in up minio: %w", err)
 	}
 	
-	// Объект сервиса
+	// Объекты сервисов
 	userService := userservice.NewUserService(pool)
+	jobService := jobservice.NewJobService(cache, minio)
+	dialogService := Dialogservice.NewDialogService(cache)
 
 	// объект хендлера
-	handler := handlers.NewServer(bot, userService, nil)// TODO: добавить сервис
+	handler := handlers.NewServer(bot, userService, jobService, dialogService) 
 
 	bot.Debug = true
 	log.Printf("\nAuthorized on account %s", bot.Self.UserName)

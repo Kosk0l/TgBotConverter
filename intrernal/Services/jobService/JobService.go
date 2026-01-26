@@ -24,7 +24,7 @@ type JobRepository interface {
 type FileRepository interface {
 	SetObject(ctx context.Context, jobId string, r io.Reader, size int64, contentType string) (error)
 	GetObject(ctx context.Context, jobId string) (io.Reader, error)
-	DeleteFile(ctx context.Context, jobId string) (error)
+	DeleteObject(ctx context.Context, jobId string) (error)
 	ExistObject(ctx context.Context, jobId string)(bool, error)
 }
 
@@ -55,7 +55,7 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 
 	// Положить в hash
 	if err := js.repo.SetToHash(ctx, job); err != nil {
-		if err2 := js.fileRepo.DeleteFile(ctx, job.JobID); err2 != nil {
+		if err2 := js.fileRepo.DeleteObject(ctx, job.JobID); err2 != nil {
 			log.Printf("rollback error DeleteFile: %v", err2)
 		}
 		return job.JobID, fmt.Errorf("jobservice - error in settohash: %w", err)
@@ -63,7 +63,7 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 
 	// Добавить в очередь
 	if err := js.repo.SetToList(ctx, job.JobID); err != nil {
-		if err2 := js.fileRepo.DeleteFile(ctx, job.JobID); err2 != nil {
+		if err2 := js.fileRepo.DeleteObject(ctx, job.JobID); err2 != nil {
 			log.Printf("rollback error DeleteFile: %v", err2)
 		}
 		if err2 := js.repo.DeleteKey(ctx, job.JobID); err2 != nil {

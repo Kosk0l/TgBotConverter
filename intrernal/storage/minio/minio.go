@@ -17,7 +17,7 @@ type Minio struct {
 }
 
 // Конструктор
-func NewMinio(ctx context.Context, cfg *config.Config, bucket string) (*Minio, error) {
+func NewMinio(ctx context.Context, cfg config.Config, bucket string) (*Minio, error) {
 	client, err := minio.New(cfg.Mi.Endpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(cfg.Mi.AccessKey, cfg.Mi.SecretKey, ""),
 		Secure: cfg.Mi.Secure,

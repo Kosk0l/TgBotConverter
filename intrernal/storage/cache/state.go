@@ -26,7 +26,7 @@ func (r *RedisSt) SetStateRepo(ctx context.Context, state domains.State) (error)
 	// Добавить hash
 	pipe.HSet(ctx, keyQuery,
 		"user_id", state.UserId,
-		"step", state.Step,
+		"step", string(state.Step),
 		"file_url", state.FileURL,
 		"file_name", state.FileName,
 		"size", state.Size,

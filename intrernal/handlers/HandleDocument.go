@@ -10,6 +10,14 @@ import (
 
 // Хендлер документов
 func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
+	if update.Message == nil {
+		return
+	}
+
+	if update.Message.Document == nil {
+		return
+	}
+
 	// Получить file
 	file := update.Message.Document
 	fileUrl, err := h.bot.GetFileDirectURL(file.FileID)
@@ -34,5 +42,22 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 		log.Printf("handler - failed setstate service: %v", err)
 		return
 	}
-	h.bot.Send(telegram.NewMessage(update.Message.Chat.ID,"В какой тип необходимо преобразовать?"))
+
+	// Подключение кнопок
+	msg := telegram.NewMessage(update.Message.Chat.ID,"В какой тип необходимо преобразовать?")
+	msg.ReplyMarkup = targetTypeKeyboard()
+	h.bot.Send(msg)
+}
+
+// Функция - добавление кнопок 
+func targetTypeKeyboard() telegram.InlineKeyboardMarkup {
+	return telegram.NewInlineKeyboardMarkup(
+		telegram.NewInlineKeyboardRow(
+			telegram.NewInlineKeyboardButtonData("📄 PDF", "to:pdf"),
+			telegram.NewInlineKeyboardButtonData("📝 DOCX", "to:docx"),
+		),
+		telegram.NewInlineKeyboardRow(
+			telegram.NewInlineKeyboardButtonData("📊 XLSX", "to:xlsx"),
+		),
+	)
 }
