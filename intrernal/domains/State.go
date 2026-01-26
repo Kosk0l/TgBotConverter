@@ -12,9 +12,9 @@ type State struct {
 	ContentType string
 }
 
+// Константы для статусов сообщений
 type Step string
-
 const (
 	WaitingTargetType Step = "waiting_target_type"
-	//..
+	//.. TODO: для новых фич
 )

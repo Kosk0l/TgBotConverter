@@ -75,20 +75,21 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 	return job.JobID, nil
 }
 
-// Получить job
-func (js *JobService) GetJob(ctx context.Context) (*domains.Job, error) {
+// Получить job // TODO: Reader потом переделать
+func (js *JobService) GetJob(ctx context.Context) (*domains.Job, io.Reader, error) {
 	// Получить id
 	jobId, err := js.repo.GetFromList(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("jobservice - error in getjob: %w", err)
+		return nil, nil, fmt.Errorf("jobservice - error in getjob: %w", err)
 	}
 
 	// Получить по id file
-	if _, err := js.fileRepo.GetObject(ctx, jobId); err != nil { //TODO: добавить reader;
+	reader, err := js.fileRepo.GetObject(ctx, jobId)
+	if err != nil {
 		if err2 := js.repo.SetToListR(ctx, jobId); err2 != nil {
 			log.Printf("rollback error SetToListR: %v", err2)
 		}
-		return nil, fmt.Errorf("jobservice - error in getobject: %w", err)
+		return nil, nil, fmt.Errorf("jobservice - error in getobject: %w", err)
 	}
 
 	// Получить по id метаданные
@@ -97,8 +98,8 @@ func (js *JobService) GetJob(ctx context.Context) (*domains.Job, error) {
 		if err2 := js.repo.SetToListR(ctx, jobId); err2 != nil {
 			log.Printf("rollback error SetToListR: %v", err2)
 		}
-		return nil, fmt.Errorf("jobservice - error in gethashdata: %w", err)
+		return nil, nil, fmt.Errorf("jobservice - error in gethashdata: %w", err)
 	}
 
-	return job, nil
+	return job, reader, nil
 }

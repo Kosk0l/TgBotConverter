@@ -30,14 +30,10 @@ func (r *RedisSt) SetToList(ctx context.Context, jobId string) (error) {
 // Добавить в hash параметры запроса
 func (r *RedisSt) SetToHash(ctx context.Context, job domains.Job) (error) {
 	query := fmt.Sprintf("job:%s", job.JobID)
-	//job.StatusJob = domains.InQueue
 	
 	err := r.rdb.HSet(ctx, query,
-		"user_id", job.UserID,
 		"chat_id", job.ChatID,
-		"file_in", job.FileTypeIn,
-		"file_to", job.FileTypeTo,
-		"status", job.StatusJob,
+		"file_to", string(job.FileTypeTo),
 	).Err()
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
@@ -78,11 +74,6 @@ func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*domains.Job, 
 		return nil, redis.Nil
 	}
 
-	userId, err := strconv.ParseInt(values["user_id"], 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("error parse user_id: %w", err)
-	}
-
 	chatId, err := strconv.ParseInt(values["chat_id"], 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("error parse chat_id: %w", err)
@@ -90,11 +81,8 @@ func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*domains.Job, 
 
 	return &domains.Job{
 		JobID:      jobId,
-		UserID:     userId,
 		ChatID:     chatId,
-		FileTypeIn: values["file_in"],
-		FileTypeTo: values["file_to"],
-		StatusJob: values["status"], //TODO: редактировать статус
+		FileTypeTo: domains.FileType(values["file_to"]),
 	}, nil
 }
 
