@@ -4,17 +4,23 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/minio/minio-go/v7"
 )
 
-
 // Добавить объект
-func(m *Minio) SetObject(ctx context.Context, jobId string, r io.Reader, size int64, contentType string) (error){
-	_, err := m.client.PutObject(ctx, m.bucket, objectName(jobId), r, size, minio.PutObjectOptions{
-		ContentType: contentType,
-	})
+func(m *Minio) SetObject(ctx context.Context, jobId string, fileUrl string, size int64, contentType string) (error){
+
+	Reader, err := http.Get(fileUrl)
 	if err != nil {
+		return fmt.Errorf("minio - error get file url: %w", err)
+	}
+	defer Reader.Body.Close()
+
+	if _, err := m.client.PutObject(ctx, m.bucket, objectName(jobId), Reader.Body, size, minio.PutObjectOptions{
+		ContentType: contentType,
+	}); err != nil {
 		return fmt.Errorf("minio - error set object:%w", err)
 	}
 

@@ -22,7 +22,7 @@ type JobRepository interface {
 
 // Абстракция для обработки сырых файлов
 type FileRepository interface {
-	SetObject(ctx context.Context, jobId string, r io.Reader, size int64, contentType string) (error)
+	SetObject(ctx context.Context, jobId string, fileUrl string, size int64, contentType string) (error)
 	GetObject(ctx context.Context, jobId string) (io.Reader, error)
 	DeleteObject(ctx context.Context, jobId string) (error)
 	ExistObject(ctx context.Context, jobId string)(bool, error)
@@ -49,8 +49,8 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 	job.JobID = uuid.NewString() // уникальный id
 
 	// Добавить file
-	if err := js.fileRepo.SetObject(ctx, job.JobID, jobObj.Reader, jobObj.Size, jobObj.ContentType); err != nil {
-		return job.JobID, fmt.Errorf("jobservice - error in setobject: %w", err)
+	if err := js.fileRepo.SetObject(ctx, job.JobID, jobObj.FlieURL, jobObj.Size, jobObj.ContentType); err != nil {
+		return "", fmt.Errorf("jobservice - error in setobject: %w", err)
 	}
 
 	// Положить в hash
@@ -58,7 +58,7 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 		if err2 := js.fileRepo.DeleteObject(ctx, job.JobID); err2 != nil {
 			log.Printf("rollback error DeleteFile: %v", err2)
 		}
-		return job.JobID, fmt.Errorf("jobservice - error in settohash: %w", err)
+		return "", fmt.Errorf("jobservice - error in settohash: %w", err)
 	}
 
 	// Добавить в очередь
@@ -69,7 +69,7 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 		if err2 := js.repo.DeleteKey(ctx, job.JobID); err2 != nil {
 			log.Printf("rollback error DeleteKey: %v", err2)
 		}
-		return job.JobID, fmt.Errorf("jobservice - error in settolist: %w", err)
+		return "", fmt.Errorf("jobservice - error in settolist: %w", err)
 	}
 
 	return job.JobID, nil

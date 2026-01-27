@@ -26,7 +26,11 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 			}
 
 			// Создание пользователя
-			h.us.CreateUserService(ctx, &user)
+			err := h.us.CreateUserService(ctx, &user) 
+			if err != nil {
+				h.bot.Send(telegram.NewMessage(chatID,"На данный момент сервис недоступен"))
+				return
+			}
 		}
 		h.bot.Send(telegram.NewMessage(chatID,"Привет! Отправь документ для конвертации."))
 	default:

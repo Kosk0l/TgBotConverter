@@ -1,10 +1,8 @@
 package domains
 
-import "io"
-
 // Для Хранилища сырых файлов
 type Object struct {
-	Reader 		io.Reader
+	FlieURL 	string
 	Size 		int64
 	ContentType string
 }

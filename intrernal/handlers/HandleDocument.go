@@ -11,7 +11,7 @@ import (
 // Хендлер документов
 func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 
-	// Получить file
+	// Получить fileUrl
 	file := update.Message.Document
 	fileUrl, err := h.bot.GetFileDirectURL(file.FileID)
 	if err != nil {
@@ -22,7 +22,6 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 	// создать состояние
 	state := domains.State{
 		ChatId: update.Message.Chat.ID,
-		UserId: update.Message.From.ID,
 		Step: domains.WaitingTargetType,
 		FileURL: fileUrl,
 		FileName: file.FileName,

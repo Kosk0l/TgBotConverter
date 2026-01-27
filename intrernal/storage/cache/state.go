@@ -23,7 +23,6 @@ func (r *RedisSt) SetStateRepo(ctx context.Context, state domains.State) (error)
 	pipe := r.rdb.TxPipeline() // начало пайплайна
 	// Добавить hash
 	pipe.HSet(ctx, keyQuery,
-		"user_id", state.UserId,
 		"step", string(state.Step),
 		"file_url", state.FileURL,
 		"file_name", state.FileName,
@@ -61,15 +60,8 @@ func (r *RedisSt) GetStateRepo(ctx context.Context, chatId int64) (*domains.Stat
 		return nil, fmt.Errorf("error parse size: %w", err)
 	}
 
-	// конвертация userId
-	userId, err := strconv.ParseInt(values["user_id"], 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("error parse user_id: %w", err)
-	}
-
 	return &domains.State{
 		ChatId: chatId,
-		UserId: userId,
 		Step: domains.Step(values["step"]),
 		FileURL: values["file_url"],
 		FileName: values["file_name"],
@@ -78,6 +70,8 @@ func (r *RedisSt) GetStateRepo(ctx context.Context, chatId int64) (*domains.Stat
 	}, nil
 }
 
+
+// TODO: распаять на весь cache
 // Удалить ключ
 func (r *RedisSt) DeleteStateRepo(ctx context.Context, chatId int64) (error) {
 	keyQuery := "chat:" + strconv.FormatInt(chatId, 10)
