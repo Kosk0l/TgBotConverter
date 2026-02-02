@@ -14,10 +14,11 @@ import (
 type JobRepository interface {
 	SetToList(ctx context.Context, jobId string) (error)
 	SetToHash(ctx context.Context, job domains.Job) (error)
+
 	GetFromList(ctx context.Context) (string, error)
 	GetFromHash(ctx context.Context, jobId string) (*domains.Job, error)
+
 	DeleteKey(ctx context.Context, jobId string) (error)
-	SetToListR(ctx context.Context, jobId string) (error)
 }
 
 // Абстракция для обработки сырых файлов
@@ -72,34 +73,36 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 		return "", fmt.Errorf("jobservice - error in settolist: %w", err)
 	}
 
+	// вернуть id
 	return job.JobID, nil
 }
 
-// Получить job // TODO: Reader потом переделать
+// Получить job
 func (js *JobService) GetJob(ctx context.Context) (*domains.Job, io.Reader, error) {
-	// Получить id
+	// Получить JobId
 	jobId, err := js.repo.GetFromList(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("jobservice - error in getjob: %w", err)
 	}
 
-	// Получить по id file
+	// Получить file по jobId
 	reader, err := js.fileRepo.GetObject(ctx, jobId)
 	if err != nil {
-		if err2 := js.repo.SetToListR(ctx, jobId); err2 != nil {
+		if err2 := js.repo.SetToList(ctx, jobId); err2 != nil {
 			log.Printf("rollback error SetToListR: %v", err2)
 		}
 		return nil, nil, fmt.Errorf("jobservice - error in getobject: %w", err)
 	}
 
-	// Получить по id метаданные
+	// Получить метаданные по JobId Во что конвертировать
 	job, err := js.repo.GetFromHash(ctx, jobId)
 	if err != nil {
-		if err2 := js.repo.SetToListR(ctx, jobId); err2 != nil {
+		if err2 := js.repo.SetToList(ctx, jobId); err2 != nil {
 			log.Printf("rollback error SetToListR: %v", err2)
 		}
 		return nil, nil, fmt.Errorf("jobservice - error in gethashdata: %w", err)
 	}
 
+	// Вернуть метаданные и reader
 	return job, reader, nil
 }

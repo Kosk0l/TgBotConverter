@@ -15,7 +15,7 @@ import (
 func (r *RedisSt) SetToList(ctx context.Context, jobId string) (error) {
 	job := fmt.Sprintf("job:%s", jobId)
 
-	err := r.rdb.LPush(ctx, "queue", job).Err()
+	err := r.rdb.RPush(ctx, "queue:jobs", job).Err()
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return err
@@ -48,15 +48,16 @@ func (r *RedisSt) SetToHash(ctx context.Context, job domains.Job) (error) {
 
 // Получить последний JobId из очереди
 func (r *RedisSt) GetFromList(ctx context.Context) (string, error) {
-	result, err := r.rdb.RPop(ctx, "queue").Result()
+	result, err := r.rdb.BLPop(ctx, 0, "queue:jobs").Result()
 	if err != nil {
-		if err == redis.Nil {
-			return "", redis.Nil // очередь пуста
-		}
-		return "", fmt.Errorf("redis: rpop failed: %w", err)
+		return "", fmt.Errorf("redis: blpop failed: %w", err)
 	}
 
-	jobId := strings.TrimPrefix(result, "job:")
+	if len(result) != 2 {
+		return "", fmt.Errorf("redis: blpop(len) failed: %w", err)
+	}
+
+	jobId := strings.TrimPrefix(result[1], "job:")
 	return jobId, nil
 }
 
@@ -93,22 +94,6 @@ func(r *RedisSt) DeleteKey(ctx context.Context, jobId string) (error) {
 	err := r.rdb.Del(ctx, query).Err()
 	if err != nil {
 		return fmt.Errorf("redis - failed delete key:%w", err)
-	}
-
-	return nil
-}
-
-
-// Вернуть данные в List справа
-func (r *RedisSt) SetToListR(ctx context.Context, jobId string) (error) {
-	job := fmt.Sprintf("job:%s", jobId)
-
-	err := r.rdb.RPush(ctx, "queue", job).Err()
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return err
-		}
-		return fmt.Errorf("redis: Rpush(list) job %s failed:%w", jobId, err)
 	}
 
 	return nil

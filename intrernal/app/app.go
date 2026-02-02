@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Kosk0l/TgBotConverter/config"
+	converterworker "github.com/Kosk0l/TgBotConverter/intrernal/ConverterWorker"
 	Dialogservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/DialogService"
 	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
 	"github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
@@ -18,8 +19,9 @@ import (
 )
 
 type App struct { 
-	bot *telegram.BotAPI
+	bot 	*telegram.BotAPI
 	handler *handlers.Handler
+	worker 	*converterworker.Worker
 }
 
 // Конструктор
@@ -58,12 +60,16 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 	// объект хендлера
 	handler := handlers.NewServer(bot, userService, jobService, dialogService) 
 
+	// объект воркера
+	worker := converterworker.NewWorker(jobService)
+
 	bot.Debug = true
 	log.Printf("\nAuthorized on account %s", bot.Self.UserName)
 	
 	return &App {
 		bot: bot,
 		handler: handler,
+		worker: worker,
 	}, nil
 }
 
