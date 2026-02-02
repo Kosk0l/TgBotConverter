@@ -8,6 +8,7 @@ import (
 
 	"github.com/Kosk0l/TgBotConverter/config"
 	converterworker "github.com/Kosk0l/TgBotConverter/intrernal/ConverterWorker"
+	converterservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/ConverterService"
 	Dialogservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/DialogService"
 	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
 	"github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
@@ -56,12 +57,13 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 	userService := userservice.NewUserService(pool)
 	jobService := jobservice.NewJobService(cache, minio)
 	dialogService := Dialogservice.NewDialogService(cache)
+	converterservice := converterservice.NewConverterService()
 
 	// объект хендлера
 	handler := handlers.NewServer(bot, userService, jobService, dialogService) 
 
 	// объект воркера
-	worker := converterworker.NewWorker(jobService)
+	worker := converterworker.NewWorker(jobService, converterservice)
 
 	bot.Debug = true
 	log.Printf("\nAuthorized on account %s", bot.Self.UserName)
@@ -74,6 +76,9 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 }
 
 func (a *App) Run(ctx context.Context) () {
+	// запуск воркера
+	go a.worker.Run(ctx)
+
 	// Настраиваем получение апдейтов
 	u := telegram.NewUpdate(0)
 	u.Timeout = 30

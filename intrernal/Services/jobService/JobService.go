@@ -16,7 +16,7 @@ type JobRepository interface {
 	SetToHash(ctx context.Context, job domains.Job) (error)
 
 	GetFromList(ctx context.Context) (string, error)
-	GetFromHash(ctx context.Context, jobId string) (*domains.Job, error)
+	GetFromHash(ctx context.Context, jobId string) (domains.Job, error)
 
 	DeleteKey(ctx context.Context, jobId string) (error)
 }
@@ -78,11 +78,11 @@ func (js *JobService) CreateJob(ctx context.Context, job domains.Job, jobObj dom
 }
 
 // Получить job
-func (js *JobService) GetJob(ctx context.Context) (*domains.Job, io.Reader, error) {
+func (js *JobService) GetJob(ctx context.Context) (domains.Job, io.Reader, error) {
 	// Получить JobId
 	jobId, err := js.repo.GetFromList(ctx)
 	if err != nil {
-		return nil, nil, fmt.Errorf("jobservice - error in getjob: %w", err)
+		return domains.Job{}, nil, fmt.Errorf("jobservice - error in getjob: %w", err)
 	}
 
 	// Получить file по jobId
@@ -91,7 +91,7 @@ func (js *JobService) GetJob(ctx context.Context) (*domains.Job, io.Reader, erro
 		if err2 := js.repo.SetToList(ctx, jobId); err2 != nil {
 			log.Printf("rollback error SetToListR: %v", err2)
 		}
-		return nil, nil, fmt.Errorf("jobservice - error in getobject: %w", err)
+		return domains.Job{}, nil, fmt.Errorf("jobservice - error in getobject: %w", err)
 	}
 
 	// Получить метаданные по JobId Во что конвертировать
@@ -100,7 +100,7 @@ func (js *JobService) GetJob(ctx context.Context) (*domains.Job, io.Reader, erro
 		if err2 := js.repo.SetToList(ctx, jobId); err2 != nil {
 			log.Printf("rollback error SetToListR: %v", err2)
 		}
-		return nil, nil, fmt.Errorf("jobservice - error in gethashdata: %w", err)
+		return domains.Job{}, nil, fmt.Errorf("jobservice - error in gethashdata: %w", err)
 	}
 
 	// Вернуть метаданные и reader

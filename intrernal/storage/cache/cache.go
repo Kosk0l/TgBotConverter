@@ -63,24 +63,24 @@ func (r *RedisSt) GetFromList(ctx context.Context) (string, error) {
 
 
 // Получить из hash данные запроса
-func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (*domains.Job, error) {
+func (r *RedisSt) GetFromHash(ctx context.Context, jobId string) (domains.Job, error) {
 	keyQuery := fmt.Sprintf("job:%s", jobId)
 
 	values, err := r.rdb.HGetAll(ctx, keyQuery).Result()
 	if err != nil {
-		return nil, fmt.Errorf("redis - hgetall job %s failed: %w", jobId, err)
+		return domains.Job{}, fmt.Errorf("redis - hgetall job %s failed: %w", jobId, err)
 	}
 
 	if len(values) == 0 {
-		return nil, redis.Nil
+		return domains.Job{}, redis.Nil
 	}
 
 	chatId, err := strconv.ParseInt(values["chat_id"], 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("error parse chat_id: %w", err)
+		return domains.Job{}, fmt.Errorf("error parse chat_id: %w", err)
 	}
 
-	return &domains.Job{
+	return domains.Job{
 		JobID:      jobId,
 		ChatID:     chatId,
 		FileTypeTo: domains.FileType(values["file_to"]),
