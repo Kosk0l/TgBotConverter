@@ -10,7 +10,7 @@ import (
 // Абстракция для cache
 type DialogRepository interface {
 	SetStateRepo(ctx context.Context, state domains.State) (error)
-	GetStateRepo(ctx context.Context, chatId int64) (*domains.State, error)
+	GetStateRepo(ctx context.Context, chatId int64) (domains.State, error)
 	DeleteStateRepo(ctx context.Context, chatId int64) (error)
 }
 
@@ -39,10 +39,10 @@ func (p *DialogService) SetState(ctx context.Context, state domains.State) (erro
 }
 
 // Получить состояние 
-func (p *DialogService) GetState(ctx context.Context, chatId int64) (*domains.State, error) {
+func (p *DialogService) GetState(ctx context.Context, chatId int64) (domains.State, error) {
 	state, err := p.dr.GetStateRepo(ctx, chatId)
 	if err != nil {
-		return nil, fmt.Errorf("dialogservice - error getstate: %w", err)
+		return domains.State{}, fmt.Errorf("dialogservice - error getstate: %w", err)
 	}
 
 	// TODO: потом вынести delete в отдельный метод

@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"context"
+	"io"
 
-	Dialogservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/DialogService"
-	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
 	userService "github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
+	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -37,6 +37,26 @@ import (
 
 //====================================================================================================
 
+type UserServiceRepository interface {
+	GetByIdService(ctx context.Context, userId int64) (domains.User, error)
+	CreateUserService(ctx context.Context, user domains.User) (error)
+	UpdateUserService(ctx context.Context, user domains.User) (error)
+	UpdateLastSeenService(ctx context.Context, userId int64) (error)
+	DeleteUserService(ctx context.Context, userId int64) (error)
+}
+
+type JobServiceRepository interface {
+	CreateJob(ctx context.Context, job domains.Job, jobObj domains.Object) (string, error)
+	GetJob(ctx context.Context) (domains.Job, io.Reader, error) 
+}
+
+type DialogServiceRepository interface {
+	SetState(ctx context.Context, state domains.State) (error)
+	GetState(ctx context.Context, chatId int64) (domains.State, error)
+}
+
+//====================================================================================================
+
 // TODO: Дальше можно разрезать по зонам ответственности: ht *HandlerText
 // TODO: добавить инъкцию зависимостей
 
@@ -44,12 +64,12 @@ import (
 type Handler struct {
 	bot *telegram.BotAPI
 	us 	*userService.UserService
-	js 	*jobservice.JobService
-	ds 	*Dialogservice.DialogService
+	js 	JobServiceRepository
+	ds 	DialogServiceRepository
 }
 
 // Конструктор
-func NewServer(bot *telegram.BotAPI, us *userService.UserService, js *jobservice.JobService, ds *Dialogservice.DialogService) (*Handler) {
+func NewServer(bot *telegram.BotAPI, us *userService.UserService, js JobServiceRepository, ds DialogServiceRepository) (*Handler) {
 	return &Handler{
 		bot: bot,
 		us: us,

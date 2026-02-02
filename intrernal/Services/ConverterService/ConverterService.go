@@ -12,6 +12,7 @@ type Converter struct {
 	//TODO:
 }
 
+// Конструктор
 func NewConverterService() (*Converter) {
 	return &Converter{}
 }

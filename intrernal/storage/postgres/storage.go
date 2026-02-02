@@ -13,7 +13,7 @@ import (
 // TODO: тестирование storage
 
 // Взять из БД пользователя по id
-func (p *Postgres) GetById(ctx context.Context, userId int64) (*domains.User, error) {
+func (p *Postgres) GetById(ctx context.Context, userId int64) (domains.User, error) {
 	query := `
 		SELECT userName, firstName, lastName, createdAt, lastSeenAt
 		FROM users WHERE id = $1;
@@ -29,18 +29,18 @@ func (p *Postgres) GetById(ctx context.Context, userId int64) (*domains.User, er
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, fmt.Errorf("user not found with id %d", userId)
+			return domains.User{}, fmt.Errorf("user not found with id %d", userId)
 		}
-		return nil, fmt.Errorf("failed to get user: %w", err)
+		return domains.User{}, fmt.Errorf("failed to get user: %w", err)
 	}
 
 	user.ID = userId
-	return &user, nil
+	return user, nil
 }
 
 
 // Создать пользователя
-func (p *Postgres) CreareUser(ctx context.Context, user *domains.User) (error){
+func (p *Postgres) CreareUser(ctx context.Context, user domains.User) (error){
 	query := `
 		INSERT INTO users (id, userName, firstName, lastName, createdAt, lastSeenAt) VALUES
 		($1, $2, $3, $4, $5, $6);
@@ -60,7 +60,7 @@ func (p *Postgres) CreareUser(ctx context.Context, user *domains.User) (error){
 
 
 // Обновить Пользователя
-func (p *Postgres) UpdateUser(ctx context.Context, user *domains.User) (error){
+func (p *Postgres) UpdateUser(ctx context.Context, user domains.User) (error){
 	query := `
 		UPDATE users
 		SET userName = $1, firstName = $2, lastName = $3

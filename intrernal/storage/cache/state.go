@@ -40,27 +40,27 @@ func (r *RedisSt) SetStateRepo(ctx context.Context, state domains.State) (error)
 }
 
 // Получить состояние
-func (r *RedisSt) GetStateRepo(ctx context.Context, chatId int64) (*domains.State, error) {
+func (r *RedisSt) GetStateRepo(ctx context.Context, chatId int64) (domains.State, error) {
 	keyQuery := "chat:" + strconv.FormatInt(chatId, 10)
 
 	// Получаем мапу из redis
 	values, err := r.rdb.HGetAll(ctx, keyQuery).Result()
 	if err != nil {
-		return nil, fmt.Errorf("redis - error get state: %w", err)
+		return domains.State{}, fmt.Errorf("redis - error get state: %w", err)
 	}
 
 	// Проверка мапы
 	if len(values) == 0 {
-		return nil, redis.Nil
+		return domains.State{}, redis.Nil
 	}
 
 	// Конвертация size
 	size, err := strconv.ParseInt(values["size"], 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("error parse size: %w", err)
+		return domains.State{}, fmt.Errorf("error parse size: %w", err)
 	}
 
-	return &domains.State{
+	return domains.State{
 		ChatId: chatId,
 		Step: domains.Step(values["step"]),
 		FileURL: values["file_url"],
