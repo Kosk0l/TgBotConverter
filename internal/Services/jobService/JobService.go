@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	"github.com/google/uuid"
 )
 

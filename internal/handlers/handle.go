@@ -4,8 +4,8 @@ import (
 	"context"
 	"io"
 
-	userService "github.com/Kosk0l/TgBotConverter/intrernal/Services/userService"
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	userService "github.com/Kosk0l/TgBotConverter/internal/Services/userService"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 

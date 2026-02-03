@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	"github.com/Kosk0l/TgBotConverter/config"
-	"github.com/Kosk0l/TgBotConverter/intrernal/app"
+	"github.com/Kosk0l/TgBotConverter/internal/app"
 )
 
 func main() {

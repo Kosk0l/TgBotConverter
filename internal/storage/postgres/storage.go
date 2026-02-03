@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"time"
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	"github.com/jackc/pgx/v5"
 )
 

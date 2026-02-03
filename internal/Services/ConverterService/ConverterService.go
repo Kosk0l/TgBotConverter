@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 )
 
 // Бизнес-логика конвертации файлов

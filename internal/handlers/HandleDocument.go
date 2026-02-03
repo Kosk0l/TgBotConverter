@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"log"
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 

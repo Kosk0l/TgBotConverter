@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	"github.com/redis/go-redis/v9"
 )
 

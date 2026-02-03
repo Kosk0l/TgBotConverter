@@ -3,7 +3,7 @@ package userservice
 import (
 	"context"
 	"fmt"
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 )
 
 // Контенкст создать в хендлере для сервисов // Контекст не должен жить долго

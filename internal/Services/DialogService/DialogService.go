@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 )
+//go:generate mockery --name=DialogRepository --output=./
 
 // Абстракция для cache
 type DialogRepository interface {

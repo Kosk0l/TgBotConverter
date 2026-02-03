@@ -5,8 +5,8 @@ import (
 	"io"
 	"log"
 
-	jobservice "github.com/Kosk0l/TgBotConverter/intrernal/Services/jobService"
-	"github.com/Kosk0l/TgBotConverter/intrernal/domains"
+	jobservice "github.com/Kosk0l/TgBotConverter/internal/Services/jobService"
+	"github.com/Kosk0l/TgBotConverter/internal/domains"
 )
 
 type ConverterRepository interface {
