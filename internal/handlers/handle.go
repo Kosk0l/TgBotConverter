@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 
-	userService "github.com/Kosk0l/TgBotConverter/internal/Services/userService"
 	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -58,18 +57,17 @@ type DialogServiceRepository interface {
 //====================================================================================================
 
 // TODO: Дальше можно разрезать по зонам ответственности: ht *HandlerText
-// TODO: добавить инъкцию зависимостей
 
 // основной хендлер сообщений
 type Handler struct {
 	bot *telegram.BotAPI
-	us 	*userService.UserService
+	us 	UserServiceRepository
 	js 	JobServiceRepository
 	ds 	DialogServiceRepository
 }
 
 // Конструктор
-func NewServer(bot *telegram.BotAPI, us *userService.UserService, js JobServiceRepository, ds DialogServiceRepository) (*Handler) {
+func NewServer(bot *telegram.BotAPI, us UserServiceRepository, js JobServiceRepository, ds DialogServiceRepository) (*Handler) {
 	return &Handler{
 		bot: bot,
 		us: us,
