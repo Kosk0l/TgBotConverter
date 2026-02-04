@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/Kosk0l/TgBotConverter/config"
-	"github.com/lmittmann/tint"
+	
 )
 
 // Конструктор
@@ -16,9 +16,8 @@ func NewLogger(cfg config.Config) (*slog.Logger) {
 	// Выбор Mode
 	switch mode {
 	case "dev":
-		handler = tint.NewHandler(os.Stdout, &tint.Options{
+		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelDebug,
-			TimeFormat: "15:04:05",
 		})
 		return slog.New(handler)
 

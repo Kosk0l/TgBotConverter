@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"io"
+	"log/slog"
 
 	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -64,15 +65,23 @@ type Handler struct {
 	us 	UserServiceRepository
 	js 	JobServiceRepository
 	ds 	DialogServiceRepository
+	log *slog.Logger
 }
 
 // Конструктор
-func NewServer(bot *telegram.BotAPI, us UserServiceRepository, js JobServiceRepository, ds DialogServiceRepository) (*Handler) {
+func NewServer(
+	bot *telegram.BotAPI,
+	us UserServiceRepository,
+	js JobServiceRepository,
+	ds DialogServiceRepository,
+	log *slog.Logger,
+) (*Handler) {
 	return &Handler{
 		bot: bot,
 		us: us,
 		js: js,
 		ds: ds,
+		log: log,
 	}
 }
 

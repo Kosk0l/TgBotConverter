@@ -28,15 +28,14 @@ type App struct {
 
 // Конструктор
 func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
-
-	// объект бота телеграмм
+	// объект бота телеграм
 	bot, err := telegram.NewBotAPI(cfg.App.TOKEN)
 	if err != nil {
 		return nil, fmt.Errorf("error in up telegram token(newapp constructor): %w", err)
 	}
 
 	// Объект логгера
-	logger.NewLogger(cfg)
+	logger := logger.NewLogger(cfg)
 
 	// объект постгреса 
 	dsn := config.LoadDsn(cfg)
@@ -64,7 +63,7 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 	converterservice := converterservice.NewConverterService()
 
 	// объект хендлера
-	handler := handlers.NewServer(bot, userService, jobService, dialogService) 
+	handler := handlers.NewServer(bot, userService, jobService, dialogService, logger) 
 
 	// объект воркера
 	worker := converterworker.NewWorker(jobService, converterservice)

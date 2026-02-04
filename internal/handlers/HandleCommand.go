@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+	"log/slog"
+
 	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -28,11 +30,20 @@ func (h *Handler) HandleCommand(ctx context.Context, update telegram.Update) {
 			// Создание пользователя
 			err := h.us.CreateUserService(ctx, user) 
 			if err != nil {
+				h.log.Error("user dnt created",
+					slog.Int64("user_id", update.Message.From.ID),
+					slog.String("user_name", update.Message.From.UserName),
+					slog.Any("error", err),
+				)
 				h.bot.Send(telegram.NewMessage(chatID,"На данный момент сервис недоступен"))
 				return
 			}
 		}
 		h.bot.Send(telegram.NewMessage(chatID,"Привет! Отправь документ для конвертации."))
+		h.log.Info("user created",
+			slog.Int64("user_id", update.Message.From.ID),
+			slog.String("user_name", update.Message.From.UserName,),
+		)
 	default:
 		h.bot.Send(telegram.NewMessage(chatID,"Неизвестная команда"))
 	}

@@ -2,20 +2,26 @@ package handlers
 
 import (
 	"context"
-	"log"
+	"log/slog"
+
 	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-
 // Хендлер документов
 func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
+	h.log.Info("user send document",
+		slog.Int64("chat_id", update.Message.Chat.ID),
+	)
 
 	// Получить fileUrl
 	file := update.Message.Document
 	fileUrl, err := h.bot.GetFileDirectURL(file.FileID)
 	if err != nil {
-		log.Printf("handler - failed get file url: %v", err)
+		h.log.Error("error - get file in handler",
+			slog.Int64("chat_id", update.Message.Chat.ID),
+			slog.Any("error", err),
+		)
 		return
 	}
 
@@ -31,14 +37,22 @@ func (h *Handler) HandleDocument(ctx context.Context, update telegram.Update) {
 
 	// Бизнес-логика - добавить состояние
 	if err := h.ds.SetState(ctx, state); err != nil {
-		log.Printf("handler - failed setstate service: %v", err)
+		h.log.Error("error - set state in handler",
+			slog.Int64("chat_id", update.Message.Chat.ID),
+			slog.Any("error", err),
+		)
 		return
 	}
 
 	// Подключение кнопок
-	msg := telegram.NewMessage(update.Message.Chat.ID,"В какой тип необходимо преобразовать?")
+	msg := telegram.NewMessage(update.Message.Chat.ID, "В какой тип необходимо преобразовать?")
 	msg.ReplyMarkup = targetTypeKeyboard()
 	h.bot.Send(msg)
+
+	h.log.Info("Success processing - set state",
+		slog.Int64("chat_id", update.Message.Chat.ID),
+		slog.String("file_url", state.FileURL),
+	)
 }
 
 // Функция - добавление кнопок 
