@@ -9,6 +9,8 @@ import (
 	"github.com/Kosk0l/TgBotConverter/internal/domains"
 	"github.com/google/uuid"
 )
+//go:generate mockery --name=JobRepository --output=./mocks
+//go:generate mockery --name=FileRepository --output=./mocks
 
 // Абстракция для cache
 type JobRepository interface {

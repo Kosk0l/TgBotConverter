@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Kosk0l/TgBotConverter/internal/domains"
 )
+//go:generate mockery --name=UserRepository --output=./mocks/
 
 // Контенкст создать в хендлере для сервисов // Контекст не должен жить долго
 type UserRepository interface {
