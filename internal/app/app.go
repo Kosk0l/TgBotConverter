@@ -13,6 +13,7 @@ import (
 	jobservice "github.com/Kosk0l/TgBotConverter/internal/Services/jobService"
 	"github.com/Kosk0l/TgBotConverter/internal/Services/userService"
 	"github.com/Kosk0l/TgBotConverter/internal/handlers"
+	"github.com/Kosk0l/TgBotConverter/internal/lib/logger"
 	"github.com/Kosk0l/TgBotConverter/internal/storage/cache"
 	"github.com/Kosk0l/TgBotConverter/internal/storage/minio"
 	"github.com/Kosk0l/TgBotConverter/internal/storage/postgres"
@@ -33,6 +34,9 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error in up telegram token(newapp constructor): %w", err)
 	}
+
+	// Объект логгера
+	logger.NewLogger(cfg)
 
 	// объект постгреса 
 	dsn := config.LoadDsn(cfg)

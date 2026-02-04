@@ -18,16 +18,19 @@ type DBConfig struct {
 	Port string `env:"POSTGRES_PORT" envDefault:"5433"`
 }
 
+// telegram
 type TGConfig struct {
 	TOKEN string `env:"TG_TOKEN,required"` // обязано существовать - Parse вернет ошибку
 }
 
+// redis
 type RedisConfig struct {
 	Addr     string `env:"REDIS_ADDR" envDefault:"localhost:6380"`
 	Password string `env:"REDIS_PASSWORD,required"`
 	DB       int    `env:"REDIS_DB" envDefault:"0"`
 }
 
+// minio
 type MinioConfig struct {
 	Endpoint 	string 	`env:"MINIO_ENDPOINT,required"`
 	AccessKey 	string 	`env:"MINIO_ROOT_USER,required"`
@@ -35,11 +38,25 @@ type MinioConfig struct {
 	Secure 		bool	`env:"MINIO_SECURE" envDefault:"false"`
 }
 
+// logger
+type LoggerConfig struct {
+	Mode	LogMode	`env:"MODE" envDefault:"dev"`
+}
+
+type LogMode string
+const (
+	Dev LogMode = "dev"
+	Prod LogMode = "prod"
+)
+
+//====================================================================================================
+
 type Config struct {
 	Db 	DBConfig
 	App TGConfig
 	Re 	RedisConfig
 	Mi	MinioConfig
+	Log LoggerConfig
 }
 
 func Load() (Config) {
