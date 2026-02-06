@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"log"
+	"log/slog"
 
 	jobservice "github.com/Kosk0l/TgBotConverter/internal/Services/jobService"
 	"github.com/Kosk0l/TgBotConverter/internal/domains"
@@ -18,13 +19,15 @@ type ConverterRepository interface {
 type Worker struct {
 	js *jobservice.JobService
 	cn ConverterRepository
+	logger *slog.Logger
 }
 
 // Конструктор
-func NewWorker(js *jobservice.JobService, cn ConverterRepository) (*Worker) {
+func NewWorker(js *jobservice.JobService, cn ConverterRepository, logger *slog.Logger) (*Worker) {
 	return &Worker{
 		js: js,
 		cn: cn,
+		logger: logger,
 	}
 }
 

@@ -66,7 +66,7 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 	handler := handlers.NewServer(bot, userService, jobService, dialogService, logger) 
 
 	// объект воркера
-	worker := converterworker.NewWorker(jobService, converterservice)
+	worker := converterworker.NewWorker(jobService, converterservice, logger)
 
 	bot.Debug = true
 	log.Printf("\nAuthorized on account %s", bot.Self.UserName)
@@ -93,7 +93,7 @@ func (a *App) Run(ctx context.Context) () {
 	// проходка по каналу
 	for update := range updates {
 		go func(update telegram.Update) {
-			ctxUpdate, cancel := context.WithTimeout(ctx, 15*time.Second)
+			ctxUpdate, cancel := context.WithTimeout(ctx, 10*time.Second)
 			defer cancel() // выход из горутины
 			a.handler.HandleUpdate(ctxUpdate, update)
 		}(update)

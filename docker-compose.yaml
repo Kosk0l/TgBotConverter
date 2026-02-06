@@ -35,7 +35,7 @@ services:
       MINIO_ROOT_PASSWORD: qwertyqwerty
     # volumes:
     #   - minio_data:/data
-    command: server /data --console-address ":9003"
+    command: server /data --console-address ":9000"
 
   # backend:
     # image:
