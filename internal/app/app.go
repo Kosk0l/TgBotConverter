@@ -78,9 +78,13 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 	}, nil
 }
 
+
 func (a *App) Run(ctx context.Context) () {
 	// запуск воркера
-	go a.worker.Run(ctx)
+	workersCount := 5
+	for i := 0; i < workersCount; i++ {
+		go a.worker.Run(ctx)
+	}
 
 	// Настраиваем получение апдейтов
 	u := telegram.NewUpdate(0)
@@ -90,9 +94,16 @@ func (a *App) Run(ctx context.Context) () {
 	// канал чтения из апи тг
 	updates := a.bot.GetUpdatesChan(u)
 
+	// Семафор хендлера
+	handlerPoll := make(chan struct{}, 100)
+
 	// проходка по каналу
 	for update := range updates {
+		handlerPoll <- struct{}{}
 		go func(update telegram.Update) {
+			defer func() {
+				<- handlerPoll
+			}()
 			ctxUpdate, cancel := context.WithTimeout(ctx, 10*time.Second)
 			defer cancel() // выход из горутины
 			a.handler.HandleUpdate(ctxUpdate, update)
