@@ -24,6 +24,7 @@ func NewLogger(cfg config.Config) (*slog.Logger) {
 	case "prod":
 		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
+			AddSource: true,
 		})
 		return slog.New(handler)
 	}

@@ -8,15 +8,7 @@ import (
 
 	"github.com/Kosk0l/TgBotConverter/config"
 	converterworker "github.com/Kosk0l/TgBotConverter/internal/ConverterWorker"
-	converterservice "github.com/Kosk0l/TgBotConverter/internal/Services/ConverterService"
-	Dialogservice "github.com/Kosk0l/TgBotConverter/internal/Services/DialogService"
-	jobservice "github.com/Kosk0l/TgBotConverter/internal/Services/jobService"
-	"github.com/Kosk0l/TgBotConverter/internal/Services/userService"
 	"github.com/Kosk0l/TgBotConverter/internal/handlers"
-	"github.com/Kosk0l/TgBotConverter/internal/lib/logger"
-	"github.com/Kosk0l/TgBotConverter/internal/storage/cache"
-	"github.com/Kosk0l/TgBotConverter/internal/storage/minio"
-	"github.com/Kosk0l/TgBotConverter/internal/storage/postgres"
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -34,39 +26,14 @@ func NewApp(ctx context.Context, cfg config.Config) (*App, error) {
 		return nil, fmt.Errorf("error in up telegram token(newapp constructor): %w", err)
 	}
 
-	// Объект логгера
-	logger := logger.NewLogger(cfg)
-
-	// объект постгреса 
-	dsn := config.LoadDsn(cfg)
-	pool, err := postgres.NewPostgres(ctx, dsn)
+	Infrastructure, err := initInfrastructure(ctx, cfg)
 	if err != nil {
-		return nil, fmt.Errorf("error in up storage: %w", err)
-	}
-
-	// объект редиса
-	cache, err := cache.NewRedis(ctx, cfg) 
-	if err != nil {
-		return nil, fmt.Errorf("error in up redis: %w", err)
-	}
-
-	// объект минио
-	minio, err := minio.NewMinio(ctx, cfg, "files") 
-	if err != nil {
-		return nil ,fmt.Errorf("error in up minio: %w", err)
+		return nil, fmt.Errorf("new app error - :%w", err)
 	}
 	
-	// Объекты сервисов
-	userService := userservice.NewUserService(pool)
-	jobService := jobservice.NewJobService(cache, minio)
-	dialogService := Dialogservice.NewDialogService(cache)
-	converterservice := converterservice.NewConverterService()
+	Services := initServices(Infrastructure)
 
-	// объект хендлера
-	handler := handlers.NewServer(bot, userService, jobService, dialogService, logger) 
-
-	// объект воркера
-	worker := converterworker.NewWorker(jobService, converterservice, logger)
+	handler, worker := initDelivery(bot, Services, Infrastructure.Logger)
 
 	bot.Debug = true
 	log.Printf("\nAuthorized on account %s", bot.Self.UserName)
